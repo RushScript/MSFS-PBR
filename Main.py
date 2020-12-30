@@ -30,8 +30,10 @@ def pbrec():
     recdata = []
     recdata.append(str(aq.get("PLANE_LATITUDE"))+"\n")
     recdata.append(str(aq.get("PLANE_LONGITUDE"))+"\n")
+    recdata.append(str(aq.get("PLANE_HEADING_DEGREES_TRUE"))+"\n")
     tgl = ae.find("TOGGLE_PUSHBACK")
     tug = ae.find("KEY_TUG_HEADING")
+    pbr = open(recdata[0].replace('\n', '').replace('.', '')+recdata[1].replace('\n', '').replace('.', '')+'.pbr', 'w')
     keyboard.add_hotkey("left", lambda:tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))-27)%360*11930464)))
     keyboard.add_hotkey("left", lambda:heading('left'))
     keyboard.add_hotkey("right", lambda:tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))+27)%360*11930464)))
@@ -40,21 +42,13 @@ def pbrec():
     keyboard.add_hotkey("down", lambda:tgl())
     keyboard.add_hotkey("down", lambda:recstate())
     while rec > 0:
-        time.sleep(0.2)
         if aq.get("GROUND_VELOCITY") > 0.1:
+            time.sleep(rft)
             recdata.append(str(int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))%360*11930464))+"\n")
-    pbr = open('longlat.pbr', 'w')
     pbr.writelines(recdata)
     pbr.close()
     sm.sendText("Push back recorded and saved to file")
     return
-
-def recfile():
-    recdata = []
-    while rec > 0:
-        recdata.append(str(int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))%360*11930464))+"\n")
-    else:
-        print(recdata)
 
 def recstate():
     global rec
@@ -70,6 +64,9 @@ def pbplay(fpath):
     Lines = pbrd.readlines()
     aq.set("PLANE_LATITUDE", float(Lines[0]))
     aq.set("PLANE_LONGITUDE", float(Lines[1]))
+    aq.set("PLANE_HEADING_DEGREES_TRUE", float(Lines[2]))
+    time.sleep(2)
+    sm.sendText("Release parking brakes")
     tgl()
     count = 0
     contact = 1
@@ -78,9 +75,11 @@ def pbplay(fpath):
             contact = 0
     for line in Lines:
         count += 1
-        if count > 2:
-            time.sleep(0.221)
+        if count > 3:
+            time.sleep(rft)
             tug(int(line.strip()))
+    time.sleep(erft)
+    sm.sendText("Set parking brakes")
     tgl()
     
 
@@ -135,6 +134,8 @@ spd = ae.find("KEY_TUG_SPEED")
 hdg = ""
 pbstp = 0
 rec = 2
+rft = 0.300
+erft = 15
 
 
 ####    print (aq.get("PLANE_LATITUDE"))
@@ -143,4 +144,4 @@ rec = 2
 ##    
 ##
 
-pbplay("./longlat.pbr")
+pbplay("3615306230296912-5347122154676827.pbr")

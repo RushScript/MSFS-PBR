@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # Push back record files
-.pbr
+*.pbr
