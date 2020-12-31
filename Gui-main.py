@@ -22,15 +22,21 @@ def customDialog(title, text, strings=('YES', 'NO'), bitmap='question', default=
     print (strings[d.num])
     return strings[d.num]
 
-
 # Button 1 function
 def btnClickFunction():
-    
-    customDialog("Push Back Recorder", "Please select Tail direction for your Push Back", strings=('Left', 'Straight', 'Right'))
+    btn2.destroy()
+    btn3.destroy()
+    HowToImg.destroy()
+    #customDialog("Push Back Recorder", "Please select Tail direction for your Push Back", strings=('Left', 'Straight', 'Right'))
+    btn1ab.place(x=35, y=52)
+    btn2ab.place(x=75, y=52)
+    btn3ab.place(x=140, y=52)
+    HowToImgTail.place(x=5, y=152)
     logging.info("Auto-Push back PBR file loaded: ")
+    btn1["state"] =  DISABLED
     btn1["bg"] = "#ffc000"
     btn1["fg"] = "#6B6B6B"
-    btn1["text"] = "Auto-Push Back Loaded (Start)"
+    btn1["text"] = "Select Auto-Push Back tail direction"
 
 
 # Button 2 function
@@ -207,6 +213,9 @@ root.update()
 global btn1
 global btn2
 global btn3
+global btn1ab
+global btn2ab
+global btn3ab
 btn1 = Button(root, text='Auto-Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction)
 btn1.place(x=5, y=12)
 btn2 = Button(root, text='Start Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
@@ -214,11 +223,22 @@ btn2.place(x=5, y=52)
 btn3 = Button(root, text='Record Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction3)
 btn3.place(x=5, y=92)
 
+btn1ab = Button(root, text='Left', state=DISABLED, bg='white', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
+btn2ab = Button(root, text='Straight', state=DISABLED, bg='white', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction3)
+btn3ab = Button(root, text='Right', state=DISABLED, bg='white', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction3)
+
+
 # GUI Canvas images
+global HowToImg
+global HowToImgTail
 HowToImg= Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
 picture_file = PhotoImage(file = 'howto.gif')
 HowToImg.create_image(380, 0, anchor=NE, image=picture_file)
 HowToImg.place(x=5, y=152)
+
+HowToImgTail= Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
+picture_fileT = PhotoImage(file = 'howtoTail.gif')
+HowToImgTail.create_image(380, 0, anchor=NE, image=picture_fileT)
 
 Logo= Canvas(root, height=100, width=100, bd=0, highlightthickness=0, relief='ridge')
 picture_fileL = PhotoImage(file = 'logo.gif')  
@@ -237,7 +257,7 @@ lbl2.place(x=250, y=83)
 
 
 smcheck = threading.Thread(target=simconnectLink)
-smcheck.start()
+#smcheck.start()
 
 
 hdg = ""
