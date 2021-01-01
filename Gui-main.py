@@ -9,7 +9,7 @@ import threading
 import keyboard
 
 # Logging configuration
-# logging.basicConfig(filename='mhaf.log', filemode='w', level=logging.DEBUG)
+# logging.basicConfig(filename='pbr.log', filemode='w', level=logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 LOGGER.info("START")
