@@ -62,8 +62,6 @@ def btnClickFunction3():
     logging.info("Recording PBR file: "+fpath)
 
 
-
-
 ## Core functions
 # Simconnect link
 def simconnectLink() :
@@ -100,7 +98,7 @@ def simconnectLink() :
                 logging.info("Retrying in 10sec")
                 continue
 
-
+# Manual Push Back
 def pb():
     tgl = ae.find("TOGGLE_PUSHBACK")
     tug = ae.find("KEY_TUG_HEADING")
@@ -113,6 +111,7 @@ def pb():
     keyboard.add_hotkey("down", lambda:pbkstate())
     return
 
+# Record Push Back 
 def pbrec():
     global recdata
     recdata = []
@@ -138,6 +137,7 @@ def pbrec():
     sm.sendText("Push back recorded and saved to file")
     return
 
+# Push Back state
 def recstate():
     global rec
     rec = rec - 1
@@ -145,6 +145,7 @@ def recstate():
         sm.sendText("Recording Push back...")
     return rec
 
+# Auto-Push Back 
 def pbplay(fpath):
     tgl = ae.find("TOGGLE_PUSHBACK")
     tug = ae.find("KEY_TUG_HEADING")
@@ -170,7 +171,7 @@ def pbplay(fpath):
     sm.sendText("Set parking brakes")
     tgl()
     
-
+# Push Back last steering direction 
 def pbst():
     tug = ae.find("KEY_TUG_HEADING")
     if (hdg == "left"):
@@ -179,12 +180,14 @@ def pbst():
         tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))+3)%360*11930464))
     return
 
+# Push Back last heading update
 def heading(trn):
     global hdg
     hdg = trn
     return hdg
 
-
+## TODO: change def pbkstate to def pbnotify
+# Push Back SM notification (Parking Brakes)
 def pbkstate():
     global pbstp
     if (pbstp == 0):
@@ -197,10 +200,10 @@ def pbkstate():
 
 
     
-
+# GUI creation
 root = Tk()
 
-# This is the section of code which creates the main window
+# Creates main window
 root.geometry('395x390')
 root.configure(background='#6B6B6B')
 root.title('Push Back Recorder')
@@ -216,13 +219,14 @@ global btn3
 global btn1ab
 global btn2ab
 global btn3ab
+# Creates Main Page buttons 
 btn1 = Button(root, text='Auto-Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction)
 btn1.place(x=5, y=12)
 btn2 = Button(root, text='Start Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
 btn2.place(x=5, y=52)
 btn3 = Button(root, text='Record Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction3)
 btn3.place(x=5, y=92)
-
+# Declares Auto-Push Back buttons
 btn1ab = Button(root, text='Left', state=DISABLED, bg='white', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
 btn2ab = Button(root, text='Straight', state=DISABLED, bg='white', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction3)
 btn3ab = Button(root, text='Right', state=DISABLED, bg='white', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction3)
@@ -231,15 +235,16 @@ btn3ab = Button(root, text='Right', state=DISABLED, bg='white', fg="white", font
 # GUI Canvas images
 global HowToImg
 global HowToImgTail
+# Creates "How to manual push back" canvas image 
 HowToImg= Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
 picture_file = PhotoImage(file = 'howto.gif')
 HowToImg.create_image(380, 0, anchor=NE, image=picture_file)
 HowToImg.place(x=5, y=152)
-
+# Declares "How to auto-push back" canvas image
 HowToImgTail= Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
 picture_fileT = PhotoImage(file = 'howtoTail.gif')
 HowToImgTail.create_image(380, 0, anchor=NE, image=picture_fileT)
-
+# Creates "Logo" canvas image
 Logo= Canvas(root, height=100, width=100, bd=0, highlightthickness=0, relief='ridge')
 picture_fileL = PhotoImage(file = 'logo.gif')  
 Logo.create_image(100, 0, anchor=NE, image=picture_fileL)
@@ -249,17 +254,18 @@ Logo.place(x=285, y=0)
 # GUI Labels
 global lbl1
 global lbl2
+# Creates Main Page labels
 lbl1 = Label(root, text='* Remember to keep this window focused while using manual/record push back', bg='#6B6B6B', fg="#ffc000", font=('arial', 7, 'normal'))
 lbl1.place(x=5, y=362)
 lbl2 = Label(root, text='SimConnect: Not linked', bg='#6B6B6B', fg="#ffc000", font=('arial', 9, 'normal'))
 lbl2.place(x=250, y=83)
 
 
-
+# Declares a new thread for simconnectLink
 smcheck = threading.Thread(target=simconnectLink)
-#smcheck.start()
 
 
+# Local variables
 hdg = ""
 pbstp = 0
 rec = 2
@@ -267,6 +273,7 @@ rft = 0.300
 erft = 15
 
 
+#smcheck.start()
 root.mainloop()
 logging.info("GUI:Exit")
 sm.exit()
