@@ -40,7 +40,8 @@ def btnClickFunction():
     btn4["bg"] = "#6B6B6B"
     btn1["text"] = "PBR File loaded"
     logging.info("Auto-Push back PBR file loaded: "+root.filename)
-    pbplay(root.filename)
+    pbplayThd = threading.Thread(target=pbrec, args=(root.filename,))
+    pbplayThd.start()
 
 
 # Button 2 function
@@ -61,8 +62,9 @@ def btnClickFunction2():
 
 # Button 3 function
 def btnClickFunction3():
+    ## TODO: Filename bug
     root.filename =  filedialog.asksaveasfilename(initialdir = os.path.dirname(os.path.realpath(__file__)), title = "Select your PBR file", filetypes = (("PBR files","*.pbr"),("all files","*.*")))
-    fpath = root.filename+".pbr"
+    fpath = root.filename
     btn1["state"] =  DISABLED
     btn2["state"] =  DISABLED
     btn3["state"] =  DISABLED
@@ -76,11 +78,14 @@ def btnClickFunction3():
     btn4["bg"] = "#6B6B6B"
     btn3["text"] = "Recording Push Back"
     logging.info("Recording PBR file: "+fpath)
-    pbrec(fpath)
+    pbrecThd = threading.Thread(target=pbrec, args=(fpath,))
+    pbrecThd.start()
 
 
 def tugtglUI():
     tugtgl()
+    if (recphase == True):
+        recstate()
     pbkstate()
 
 
@@ -153,7 +158,9 @@ def pb():
 
 # Record Push Back 
 def pbrec(fpath):
+    global recphase
     global recdata
+    recphase = True
     recdata = []
     recdata.append(str(aq.get("PLANE_LATITUDE"))+"\n")
     recdata.append(str(aq.get("PLANE_LONGITUDE"))+"\n")
@@ -166,14 +173,16 @@ def pbrec(fpath):
     keyboard.add_hotkey("right", lambda:heading('right'))
     keyboard.add_hotkey("up", lambda:pbst())
     keyboard.add_hotkey("down", lambda:tugtgl())
+    keyboard.add_hotkey("down", lambda:pbkstate())
     keyboard.add_hotkey("down", lambda:recstate())
     while rec > 0:
+        ## TODO: Too many requests?
         if aq.get("GROUND_VELOCITY") > 0.1:
             time.sleep(rft)
             recdata.append(str(int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))%360*11930464))+"\n")
     pbr.writelines(recdata)
     pbr.close()
-    sm.sendText("Push back recorded and saved to file")
+    sm.sendText("Push back recorded and saved to file: "+fpath)
     restartAll()
     return
 
