@@ -11,11 +11,10 @@ import threading
 import keyboard
 
 # Logging configuration
-# logging.basicConfig(filename='pbr.log', filemode='w', level=logging.DEBUG)
+logging.basicConfig(filename='pbr.log', filemode='w', level=logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 LOGGER.info("START")
-
 
 ## GUI functions
 # Custom dialog function
@@ -44,7 +43,6 @@ def btnClickFunction():
     pbplayThd = threading.Thread(target=pbplay, args=(fpath,))
     pbplayThd.start()
 
-
 # Button 2 function
 def btnClickFunction2():
     btn1["state"] =  DISABLED
@@ -60,7 +58,6 @@ def btnClickFunction2():
     btn4["bg"] = "#6B6B6B"
     pb()
 
-
 # Button 3 function
 def btnClickFunction3():
     ## TODO: Filename bug
@@ -68,7 +65,7 @@ def btnClickFunction3():
     if str(root.filename).find(".pbr") != -1:
         fpath = root.filename
     else:
-        fpath = root.filename+".pbr" 
+        fpath = root.filename+".pbr"
     btn1["state"] =  DISABLED
     btn2["state"] =  DISABLED
     btn3["state"] =  DISABLED
@@ -85,14 +82,12 @@ def btnClickFunction3():
     pbrecThd = threading.Thread(target=pbrec, args=(fpath,))
     pbrecThd.start()
 
-
 def tugtglUI():
     tugtgl()
     if (recphase == True):
         recstate()
     else:
         pbkstate()
-
 
 def jetwaytglUI():
     jetwaytgl()
@@ -102,7 +97,6 @@ def restartAll():
     sm.exit()
     os.execv(sys.executable, ['python'] + sys.argv)
     os._exit(0)
-
 
 ## Core functions
 # Simconnect link
@@ -167,6 +161,7 @@ def pbrec(fpath):
     recdata.append(str(aq.get("PLANE_LONGITUDE"))+"\n")
     recdata.append(str(aq.get("PLANE_HEADING_DEGREES_TRUE"))+"\n")
     pbr = open(fpath, 'w')
+    logging.info("Record Push Back started")
     #pbr = open(recdata[0].replace('\n', '').replace('.', '')+recdata[1].replace('\n', '').replace('.', '')+'.pbr', 'w')
     keyboard.add_hotkey("left", lambda:tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))-27)%360*11930464)))
     keyboard.add_hotkey("left", lambda:heading('left'))
@@ -176,19 +171,19 @@ def pbrec(fpath):
     keyboard.add_hotkey("down", lambda:tugtgl())
     keyboard.add_hotkey("down", lambda:recstate())
     while rec > 0:
-        ## TODO: Too many requests?
         try:
             if aq.get("GROUND_VELOCITY") > 0.1:
                 time.sleep(rft)
                 recdata.append(str(int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))%360*11930464))+"\n")
         except:
-            pass
+            logging.warning("aq.get(""GROUND_VELOCITY"") return null")
     pbr.writelines(recdata)
     pbr.close()
+    logging.info("Push back recorded and saved to file: "+fpath)
     sm.sendText("Push back recorded and saved to file: "+fpath)
+    logging.info("Record Push Back ended")
     time.sleep(2)
     restartAll()
-
 
 # Push Back state
 def recstate():
@@ -199,7 +194,6 @@ def recstate():
         sm.sendText("Recording Push back...")
     return rec
 
-
 # Auto-Push Back 
 def pbplay(fpath):
     pbrd = open(fpath, 'r') 
@@ -207,6 +201,7 @@ def pbplay(fpath):
     aq.set("PLANE_LATITUDE", float(Lines[0]))
     aq.set("PLANE_LONGITUDE", float(Lines[1]))
     aq.set("PLANE_HEADING_DEGREES_TRUE", float(Lines[2]))
+    logging.info("Applying -> Lat: "+str(Lines[0])+" Lon: "+str(Lines[1])+" Hdg: "+str(Lines[2]))
     time.sleep(2)
     keyboard.add_hotkey("down", lambda:tugtgl())
     keyboard.add_hotkey("down", lambda:pbkstate())
@@ -218,6 +213,7 @@ def pbplay(fpath):
                 contact = 0
         except:
             pass
+    logging.info("Auto-Push back started")
     btn4["state"] =  DISABLED
     btn4["bg"] = "white"
     btn4["fg"] = "#6B6B6B"
@@ -228,9 +224,9 @@ def pbplay(fpath):
             tug(int(line.strip()))
     time.sleep(erft)
     tugtgl()
+    logging.info("Auto-Push back started")
     pbkstate()
-
-    
+   
 # Push Back last steering direction 
 def pbst():
     tug = ae.find("KEY_TUG_HEADING")
@@ -280,9 +276,7 @@ global btn2
 global btn3
 global btn4
 global btn5
-global btnapb1
-global btnapb2
-global btnpb1
+
 # Creates Main Page buttons 
 btn1 = Button(root, text='Auto-Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction)
 btn1.place(x=5, y=10)
@@ -294,25 +288,28 @@ btn4 = Button(root, text='Toggle / Push Back', state=DISABLED, bg='white', fg="w
 btn4.place(x=135, y=10)
 btn5 = Button(root, text='Toggle / Jetway', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=jetwaytglUI)
 btn5.place(x=135, y=50)
+
 # Declares Auto-Push Back buttons
 btnapb1 = Button(root, text='Click to start Auto-Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
 btnapb2 = Button(root, text='Toggle / Jetway', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
 btnpb1 = Button(root, text='Stop Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
 
-
 # GUI Canvas images
 global HowToImg
 global HowToImgTail
+
 # Creates "How to manual push back" canvas image 
 HowToImg= Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
 picture_file = PhotoImage(file = 'howto.gif')
 HowToImg.create_image(380, 0, anchor=NE, image=picture_file)
 HowToImg.place(x=5, y=152)
+
 # Declares "How to auto-push back" canvas image
 HowToImgTail= Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
 picture_fileT = PhotoImage(file = 'howtoTail.gif')
 HowToImgTail.create_image(380, 0, anchor=NE, image=picture_fileT)
 # Creates "Logo" canvas image
+
 Logo= Canvas(root, height=100, width=100, bd=0, highlightthickness=0, relief='ridge')
 picture_fileL = PhotoImage(file = 'logo.gif')  
 Logo.create_image(100, 0, anchor=NE, image=picture_fileL)
