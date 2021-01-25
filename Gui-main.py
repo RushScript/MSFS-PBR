@@ -27,6 +27,7 @@ def customDialog(title, text, strings=('YES', 'NO'), bitmap='question', default=
 # Button 1 function
 def btnClickFunction():
     root.filename =  filedialog.askopenfilename(initialdir = os.path.dirname(os.path.realpath(__file__)), title = "Select your PBR file", filetypes = (("PBR files","*.pbr"),("all files","*.*")))
+    fpath = root.filename
     btn1["state"] =  DISABLED
     btn2["state"] =  DISABLED
     btn3["state"] =  DISABLED
@@ -39,8 +40,8 @@ def btnClickFunction():
     btn3["fg"] = "#6B6B6B"
     btn4["bg"] = "#6B6B6B"
     btn1["text"] = "PBR File loaded"
-    logging.info("Auto-Push back PBR file loaded: "+root.filename)
-    pbplayThd = threading.Thread(target=pbrec, args=(root.filename,))
+    logging.info("Auto-Push back PBR file loaded: "+fpath)
+    pbplayThd = threading.Thread(target=pbplay, args=(fpath,))
     pbplayThd.start()
 
 
@@ -64,7 +65,10 @@ def btnClickFunction2():
 def btnClickFunction3():
     ## TODO: Filename bug
     root.filename =  filedialog.asksaveasfilename(initialdir = os.path.dirname(os.path.realpath(__file__)), title = "Select your PBR file", filetypes = (("PBR files","*.pbr"),("all files","*.*")))
-    fpath = root.filename
+    if str(root.filename).find(".pbr") != -1:
+        fpath = root.filename
+    else:
+        fpath = root.filename+".pbr" 
     btn1["state"] =  DISABLED
     btn2["state"] =  DISABLED
     btn3["state"] =  DISABLED
@@ -86,7 +90,8 @@ def tugtglUI():
     tugtgl()
     if (recphase == True):
         recstate()
-    pbkstate()
+    else:
+        pbkstate()
 
 
 def jetwaytglUI():
@@ -95,10 +100,6 @@ def jetwaytglUI():
 def restartAll():
     smcheck.join()
     sm.exit()
-    logging.info("SimConnect:Clean exit")
-    logging.info("argv was",sys.argv)
-    logging.info("sys.executable was", sys.executable)
-    logging.info("restart now")
     os.execv(sys.executable, ['python'] + sys.argv)
     os._exit(0)
 
@@ -173,24 +174,28 @@ def pbrec(fpath):
     keyboard.add_hotkey("right", lambda:heading('right'))
     keyboard.add_hotkey("up", lambda:pbst())
     keyboard.add_hotkey("down", lambda:tugtgl())
-    keyboard.add_hotkey("down", lambda:pbkstate())
     keyboard.add_hotkey("down", lambda:recstate())
     while rec > 0:
         ## TODO: Too many requests?
-        if aq.get("GROUND_VELOCITY") > 0.1:
-            time.sleep(rft)
-            recdata.append(str(int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))%360*11930464))+"\n")
+        try:
+            if aq.get("GROUND_VELOCITY") > 0.1:
+                time.sleep(rft)
+                recdata.append(str(int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))%360*11930464))+"\n")
+        except:
+            pass
     pbr.writelines(recdata)
     pbr.close()
     sm.sendText("Push back recorded and saved to file: "+fpath)
+    time.sleep(2)
     restartAll()
-    return
+
 
 # Push Back state
 def recstate():
     global rec
     rec = rec - 1
     if (rec == 1):
+        sm.sendText("Release parking brakes")
         sm.sendText("Recording Push back...")
     return rec
 
@@ -208,8 +213,11 @@ def pbplay(fpath):
     count = 0
     contact = 1
     while contact > 0:
-        if aq.get("GROUND_VELOCITY") > 0.1:
-            contact = 0
+        try:
+            if aq.get("GROUND_VELOCITY") > 0.1:
+                contact = 0
+        except:
+            pass
     btn4["state"] =  DISABLED
     btn4["bg"] = "white"
     btn4["fg"] = "#6B6B6B"
@@ -248,6 +256,7 @@ def pbkstate():
     else:
         sm.sendText("Set parking brakes")
         pbstp = 0
+        time.sleep(2)
         restartAll()
 
 
@@ -322,9 +331,10 @@ lbl2.place(x=250, y=83)
 
 # Declares a new thread for simconnectLink
 smcheck = threading.Thread(target=simconnectLink)
-smcheck.start()
+
 
 # Local variables
+recphase = False
 hdg = ""
 pbstp = 0
 rec = 2
@@ -332,7 +342,7 @@ rft = 0.300 # Refresh rate
 erft = 15   #Error Bug refresh rate
 
 
-#smcheck.start()
+smcheck.start()
 root.mainloop()
 smcheck.join()
 logging.info("GUI:Exit")
