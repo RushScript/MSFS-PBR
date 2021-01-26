@@ -27,21 +27,24 @@ def customDialog(title, text, strings=('YES', 'NO'), bitmap='question', default=
 def btnClickFunction():
     root.filename =  filedialog.askopenfilename(initialdir = os.path.dirname(os.path.realpath(__file__)), title = "Select your PBR file", filetypes = (("PBR files","*.pbr"),("all files","*.*")))
     fpath = root.filename
-    btn1["state"] =  DISABLED
-    btn2["state"] =  DISABLED
-    btn3["state"] =  DISABLED
-    btn4["state"] =  NORMAL
-    btn1["bg"] = "#adf542"
-    btn1["fg"] = "#6B6B6B"
-    btn2["bg"] = "white"
-    btn2["fg"] = "#6B6B6B"
-    btn3["bg"] = "white"
-    btn3["fg"] = "#6B6B6B"
-    btn4["bg"] = "#6B6B6B"
-    btn1["text"] = "PBR File loaded"
-    logging.info("Auto-Push back PBR file loaded: "+fpath)
-    pbplayThd = threading.Thread(target=pbplay, args=(fpath,))
-    pbplayThd.start()
+    if fpath:
+        btn1["state"] =  DISABLED
+        btn2["state"] =  DISABLED
+        btn3["state"] =  DISABLED
+        btn4["state"] =  NORMAL
+        btn1["bg"] = "#adf542"
+        btn1["fg"] = "#6B6B6B"
+        btn2["bg"] = "white"
+        btn2["fg"] = "#6B6B6B"
+        btn3["bg"] = "white"
+        btn3["fg"] = "#6B6B6B"
+        btn4["bg"] = "#6B6B6B"
+        btn1["text"] = "PBR File loaded"
+        logging.info("Auto-Push back PBR file loaded: "+fpath)
+        pbplayThd = threading.Thread(target=pbplay, args=(fpath,))
+        pbplayThd.start()
+    else:
+        logging.info("Auto-Push back PBR file loaded: Cancelled by user input")
 
 # Button 2 function
 def btnClickFunction2():
@@ -62,25 +65,28 @@ def btnClickFunction2():
 def btnClickFunction3():
     ## TODO: Filename bug
     root.filename =  filedialog.asksaveasfilename(initialdir = os.path.dirname(os.path.realpath(__file__)), title = "Select your PBR file", filetypes = (("PBR files","*.pbr"),("all files","*.*")))
-    if str(root.filename).find(".pbr") != -1:
-        fpath = root.filename
+    if root.filename:
+        if str(root.filename).find(".pbr") != -1:
+            fpath = root.filename
+        else:
+            fpath = root.filename+".pbr"
+        btn1["state"] =  DISABLED
+        btn2["state"] =  DISABLED
+        btn3["state"] =  DISABLED
+        btn4["state"] =  NORMAL
+        btn1["bg"] = "white"
+        btn1["fg"] = "#6B6B6B"
+        btn2["bg"] = "white"
+        btn2["fg"] = "#6B6B6B"
+        btn3["bg"] = "#adf542"
+        btn3["fg"] = "#6B6B6B"
+        btn4["bg"] = "#6B6B6B"
+        btn3["text"] = "Recording Push Back"
+        logging.info("Recording PBR file: "+fpath)
+        pbrecThd = threading.Thread(target=pbrec, args=(fpath,))
+        pbrecThd.start()
     else:
-        fpath = root.filename+".pbr"
-    btn1["state"] =  DISABLED
-    btn2["state"] =  DISABLED
-    btn3["state"] =  DISABLED
-    btn4["state"] =  NORMAL
-    btn1["bg"] = "white"
-    btn1["fg"] = "#6B6B6B"
-    btn2["bg"] = "white"
-    btn2["fg"] = "#6B6B6B"
-    btn3["bg"] = "#adf542"
-    btn3["fg"] = "#6B6B6B"
-    btn4["bg"] = "#6B6B6B"
-    btn3["text"] = "Recording Push Back"
-    logging.info("Recording PBR file: "+fpath)
-    pbrecThd = threading.Thread(target=pbrec, args=(fpath,))
-    pbrecThd.start()
+        logging.info("Recording PBR file: Cancelled by user input")
 
 def tugtglUI():
     tugtgl()
@@ -97,6 +103,26 @@ def restartAll():
     sm.exit()
     os.execv(sys.executable, ['python'] + sys.argv)
     os._exit(0)
+
+def resetUI():
+    btn1["state"] =  NORMAL
+    btn1["fg"] = "white"
+    btn1["bg"] = "#6B6B6B"
+    btn1["text"] = "Auto-Push Back"
+    btn2["state"] =  NORMAL
+    btn2["fg"] = "white"
+    btn2["bg"] = "#6B6B6B"
+    btn3["state"] =  NORMAL
+    btn3["fg"] = "white"
+    btn3["bg"] = "#6B6B6B"
+    btn3["text"] = "Record Push Back"
+    btn4["state"] =  DISABLED
+    btn4["fg"] = "white"
+    btn4["bg"] = "white"
+    btn5["state"] =  NORMAL
+    btn5["fg"] = "white"
+    btn5["bg"] = "#6B6B6B"
+    logging.info("UI Reset -> Back to main page")
 
 ## Core functions
 # Simconnect link
@@ -183,7 +209,7 @@ def pbrec(fpath):
     sm.sendText("Push back recorded and saved to file: "+fpath)
     logging.info("Record Push Back ended")
     time.sleep(2)
-    restartAll()
+    resetUI()
 
 # Push Back state
 def recstate():
@@ -201,7 +227,9 @@ def pbplay(fpath):
     aq.set("PLANE_LATITUDE", float(Lines[0]))
     aq.set("PLANE_LONGITUDE", float(Lines[1]))
     aq.set("PLANE_HEADING_DEGREES_TRUE", float(Lines[2]))
-    logging.info("Applying -> Lat: "+str(Lines[0])+" Lon: "+str(Lines[1])+" Hdg: "+str(Lines[2]))
+    logging.info("Applying -> Lat: "+str(Lines[0]).replace("\n", ""))
+    logging.info("Applying -> Lon: "+str(Lines[1]).replace("\n", ""))
+    logging.info("Applying -> Hdg: "+str(Lines[2]).replace("\n", ""))
     time.sleep(2)
     keyboard.add_hotkey("down", lambda:tugtgl())
     keyboard.add_hotkey("down", lambda:pbkstate())
@@ -224,7 +252,7 @@ def pbplay(fpath):
             tug(int(line.strip()))
     time.sleep(erft)
     tugtgl()
-    logging.info("Auto-Push back started")
+    logging.info("Auto-Push back ended")
     pbkstate()
    
 # Push Back last steering direction 
@@ -253,7 +281,7 @@ def pbkstate():
         sm.sendText("Set parking brakes")
         pbstp = 0
         time.sleep(2)
-        restartAll()
+        resetUI()
 
 
 
