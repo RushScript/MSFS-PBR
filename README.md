@@ -13,6 +13,7 @@ Push Back Recorder is an MSFS2020 Push Back utility add-on which allows you to r
 
 
 ## Requirements (If you plan to use the source code)
+- [Python 3.8.7](https://www.python.org/downloads/release/python-387/)
 - [Python-SimConnect](https://github.com/odwdinc/Python-SimConnect)
 - [keyboard](https://github.com/boppreh/keyboard)
 - [Auto PY to EXE](https://github.com/brentvollebregt/auto-py-to-exe)
