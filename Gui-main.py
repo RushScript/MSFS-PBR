@@ -371,6 +371,9 @@ smcheck.start()
 root.mainloop()
 smcheck.join()
 logging.info("GUI:Exit")
-sm.exit()
+try:
+    sm.exit()
+except:
+    pass
 logging.info("SimConnect:Clean exit")
 os._exit(0)
