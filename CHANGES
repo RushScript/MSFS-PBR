@@ -1,2 +1,8 @@
-[FIX] Fixed PBR showing Tip message in MSFS2020 "Recording push back..." while using Manual Push back and Auto-Push back feature
-[ADD] Added App icon
+- CHANGES ON THIS VERSION:
+
+
+-- [FIX] Fixed PBR showing Tip message in MSFS2020 "Recording push back..." while using Manual Push back and Auto-Push back feature
+
+-- [FIX] Record Push Back being not able to record
+
+-- [ADD] Added App icon
