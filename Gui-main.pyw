@@ -168,6 +168,7 @@ def simconnectLink() :
 
 # Manual Push Back
 def pb():
+    recphase = False
     keyboard.add_hotkey("left", lambda:tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))-27)%360*11930464)))
     keyboard.add_hotkey("left", lambda:heading('left'))
     keyboard.add_hotkey("right", lambda:tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))+27)%360*11930464)))
@@ -179,7 +180,6 @@ def pb():
 
 # Record Push Back 
 def pbrec(fpath):
-    global recphase
     global recdata
     recphase = True
     recdata = []
@@ -222,6 +222,7 @@ def recstate():
 
 # Auto-Push Back 
 def pbplay(fpath):
+    recphase = False
     pbrd = open(fpath, 'r') 
     Lines = pbrd.readlines()
     aq.set("PLANE_LATITUDE", float(Lines[0]))
@@ -295,6 +296,7 @@ root.configure(background='#6B6B6B')
 root.title('Push Back Recorder')
 root.resizable(width=False, height=False)
 root.attributes('-topmost', True)
+root.iconbitmap(default="AppIcon.ico")
 root.update()
 
 
@@ -358,8 +360,10 @@ lbl2.place(x=250, y=83)
 smcheck = threading.Thread(target=simconnectLink)
 
 
-# Local variables
+# Global variables
+global recphase
 recphase = False
+#Local variables
 hdg = ""
 pbstp = 0
 rec = 2
