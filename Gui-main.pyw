@@ -90,7 +90,7 @@ def btnClickFunction3():
 
 def tugtglUI():
     tugtgl()
-    if (recphase == True):
+    if recphase is True:
         recstate()
     else:
         pbkstate()
@@ -180,6 +180,7 @@ def pb():
 
 # Record Push Back 
 def pbrec(fpath):
+    global recphase
     global recdata
     recphase = True
     recdata = []
