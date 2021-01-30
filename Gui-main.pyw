@@ -18,14 +18,12 @@ logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 LOGGER.info("START")
 
-
 ## GUI functions
 # Custom dialog function
 def customDialog(title, text, strings=('YES', 'NO'), bitmap='question', default=1):
     d = dialog.Dialog(title=title, text=text, bitmap=bitmap, default=default, strings=strings)
     print(strings[d.num])
     return strings[d.num]
-
 
 # Button 1 function
 def btnClickFunction():
@@ -52,7 +50,6 @@ def btnClickFunction():
     else:
         logging.info("Auto-Push back PBR file loaded: Cancelled by user input")
 
-
 # Button 2 function
 def btnClickFunction2():
     btn1["state"] = DISABLED
@@ -67,7 +64,6 @@ def btnClickFunction2():
     btn3["fg"] = "#6B6B6B"
     btn4["bg"] = "#6B6B6B"
     pb()
-
 
 # Button 3 function
 def btnClickFunction3():
@@ -98,7 +94,7 @@ def btnClickFunction3():
     else:
         logging.info("Recording PBR file: Cancelled by user input")
 
-
+# Toggles the push back using the GUI button
 def tugtglUI():
     tugtgl()
     if recphase is True:
@@ -106,11 +102,11 @@ def tugtglUI():
     else:
         pbkstate()
 
-
+# Toggles the jetway  using the GUI button
 def jetwaytglUI():
     jetwaytgl()
 
-
+# On start GUI function
 def startAll():
     global settings
     global settooltip
@@ -131,10 +127,9 @@ def startAll():
         except:
             logging.error(os.path.realpath(__file__)+" settings.json write permissions denied")
             ## TODO: Save into user directory to avoid error
-        
-        
 
 ## TODO: to be deleted soon
+# Restarts the whole script 
 def restartAll():
     if (smconnected == 1):
         smcheck.join()
@@ -144,6 +139,7 @@ def restartAll():
     logging.info("APP:Restart")
     os._exit(0)
 
+# On exit GUI function
 def exitAll():
     if (smconnected == 1):
         smcheck.join()
@@ -152,7 +148,7 @@ def exitAll():
     logging.info("APP:Exit")
     os._exit(0)
 
-
+# Resets the GUI to the default page
 def resetUI():
     pbstp = 0
     recphase = False
@@ -176,10 +172,11 @@ def resetUI():
     btn5["bg"] = "#6B6B6B"
     logging.info("UI Reset -> Back to main page")
 
-
+# About menu bar click function
 def aboutClickFunction():
     webbrowser.open("https://github.com/RushScript/MSFS-PBR")
 
+# Sim-tooltips menu bar click function
 def tooltips():
     if settings["tooltips"] is True:
         settings["tooltips"] = False
@@ -250,7 +247,6 @@ def pb():
     keyboard.add_hotkey("down", lambda: tugtgl())
     return
 
-
 # Record Push Back
 def pbrec(fpath):
     global recphase
@@ -287,8 +283,7 @@ def pbrec(fpath):
     time.sleep(2)
     resetUI()
 
-
-# Push Back state
+# Push Back rec state
 def recstate():
     global rec
     rec = rec - 1
@@ -296,7 +291,6 @@ def recstate():
         sm.sendText("Release parking brakes")
         sm.sendText("Recording Push back...")
     return rec
-
 
 # Auto-Push Back
 def pbplay(fpath):
@@ -333,7 +327,6 @@ def pbplay(fpath):
     logging.info("Auto-Push back ended")
     pbkstate()
 
-
 # Push Back last steering direction 
 def pbst():
     tug = ae.find("KEY_TUG_HEADING")
@@ -343,13 +336,11 @@ def pbst():
         tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) + 3) % 360 * 11930464))
     return
 
-
 # Push Back last heading update
 def heading(trn):
     global hdg
     hdg = trn
     return hdg
-
 
 ## TODO: change def pbkstate to def pbnotify
 # Push Back SM notification (Parking Brakes)
@@ -365,6 +356,7 @@ def pbkstate():
         time.sleep(2)
         resetUI()
 
+## Code sequence starts here
 startAll()
 
 # GUI creation
@@ -379,7 +371,7 @@ root.attributes('-topmost', True)
 root.iconbitmap(default="AppIcon.ico")
 root.update()
 
-# Menu Bar
+# Creates the Menu Bar
 global settingsmenu
 menubar = Menu(root)
 menubar = Menu(root)
@@ -440,8 +432,8 @@ HowToImg.place(x=5, y=152)
 HowToImgTail = Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
 picture_fileT = PhotoImage(file='howtoTail.gif')
 HowToImgTail.create_image(380, 0, anchor=NE, image=picture_fileT)
-# Creates "Logo" canvas image
 
+# Creates "Logo" canvas image
 Logo = Canvas(root, height=100, width=100, bd=0, highlightthickness=0, relief='ridge')
 picture_fileL = PhotoImage(file='logo.gif')
 Logo.create_image(100, 0, anchor=NE, image=picture_fileL)
@@ -466,7 +458,7 @@ pbstp = 0
 recphase = False
 rec = 2
 rft = 0.300  # Refresh rate
-erft = 15  # Error Bug refresh rate
+erft = 15    # Error Bug refresh rate
 
 smcheck.start()
 root.config(menu=menubar)
