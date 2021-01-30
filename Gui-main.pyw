@@ -187,7 +187,6 @@ def tooltips():
         settingsmenu.entryconfigure(1, label="Sim-Tooltips \u2713")
         json.dump(settings, open("settings.json", 'w'))
 
-
 ## Core functions
 # Simconnect link
 def simconnectLink():
@@ -231,7 +230,6 @@ def simconnectLink():
                 lbl2["text"] = "SimConnect: Not linked"
                 logging.info("Retrying in 10sec")
                 continue
-
 
 # Manual Push Back
 def pb():
