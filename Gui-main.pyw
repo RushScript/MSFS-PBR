@@ -8,6 +8,8 @@ import logging
 import math
 import time
 import threading
+import json
+import webbrowser
 import keyboard
 
 # Logging configuration
@@ -16,22 +18,26 @@ logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 LOGGER.info("START")
 
+
 ## GUI functions
 # Custom dialog function
 def customDialog(title, text, strings=('YES', 'NO'), bitmap='question', default=1):
     d = dialog.Dialog(title=title, text=text, bitmap=bitmap, default=default, strings=strings)
-    print (strings[d.num])
+    print(strings[d.num])
     return strings[d.num]
+
 
 # Button 1 function
 def btnClickFunction():
-    root.filename =  filedialog.askopenfilename(initialdir = os.path.dirname(os.path.realpath(__file__)), title = "Select your PBR file", filetypes = (("PBR files","*.pbr"),("all files","*.*")))
+    root.filename = filedialog.askopenfilename(initialdir=os.path.dirname(os.path.realpath(__file__)),
+                                               title="Select your PBR file",
+                                               filetypes=(("PBR files", "*.pbr"), ("all files", "*.*")))
     fpath = root.filename
     if fpath:
-        btn1["state"] =  DISABLED
-        btn2["state"] =  DISABLED
-        btn3["state"] =  DISABLED
-        btn4["state"] =  NORMAL
+        btn1["state"] = DISABLED
+        btn2["state"] = DISABLED
+        btn3["state"] = DISABLED
+        btn4["state"] = NORMAL
         btn1["bg"] = "#adf542"
         btn1["fg"] = "#6B6B6B"
         btn2["bg"] = "white"
@@ -40,18 +46,19 @@ def btnClickFunction():
         btn3["fg"] = "#6B6B6B"
         btn4["bg"] = "#6B6B6B"
         btn1["text"] = "PBR File loaded"
-        logging.info("Auto-Push back PBR file loaded: "+fpath)
+        logging.info("Auto-Push back PBR file loaded: " + fpath)
         pbplayThd = threading.Thread(target=pbplay, args=(fpath,))
         pbplayThd.start()
     else:
         logging.info("Auto-Push back PBR file loaded: Cancelled by user input")
 
+
 # Button 2 function
 def btnClickFunction2():
-    btn1["state"] =  DISABLED
-    btn2["state"] =  DISABLED
-    btn3["state"] =  DISABLED
-    btn4["state"] =  NORMAL
+    btn1["state"] = DISABLED
+    btn2["state"] = DISABLED
+    btn3["state"] = DISABLED
+    btn4["state"] = NORMAL
     btn1["bg"] = "white"
     btn1["fg"] = "#6B6B6B"
     btn2["bg"] = "#adf542"
@@ -61,19 +68,22 @@ def btnClickFunction2():
     btn4["bg"] = "#6B6B6B"
     pb()
 
+
 # Button 3 function
 def btnClickFunction3():
     ## TODO: Filename bug
-    root.filename =  filedialog.asksaveasfilename(initialdir = os.path.dirname(os.path.realpath(__file__)), title = "Select your PBR file", filetypes = (("PBR files","*.pbr"),("all files","*.*")))
+    root.filename = filedialog.asksaveasfilename(initialdir=os.path.dirname(os.path.realpath(__file__)),
+                                                 title="Select your PBR file",
+                                                 filetypes=(("PBR files", "*.pbr"), ("all files", "*.*")))
     if root.filename:
         if str(root.filename).find(".pbr") != -1:
             fpath = root.filename
         else:
-            fpath = root.filename+".pbr"
-        btn1["state"] =  DISABLED
-        btn2["state"] =  DISABLED
-        btn3["state"] =  DISABLED
-        btn4["state"] =  NORMAL
+            fpath = root.filename + ".pbr"
+        btn1["state"] = DISABLED
+        btn2["state"] = DISABLED
+        btn3["state"] = DISABLED
+        btn4["state"] = NORMAL
         btn1["bg"] = "white"
         btn1["fg"] = "#6B6B6B"
         btn2["bg"] = "white"
@@ -82,11 +92,12 @@ def btnClickFunction3():
         btn3["fg"] = "#6B6B6B"
         btn4["bg"] = "#6B6B6B"
         btn3["text"] = "Recording Push Back"
-        logging.info("Recording PBR file: "+fpath)
+        logging.info("Recording PBR file: " + fpath)
         pbrecThd = threading.Thread(target=pbrec, args=(fpath,))
         pbrecThd.start()
     else:
         logging.info("Recording PBR file: Cancelled by user input")
+
 
 def tugtglUI():
     tugtgl()
@@ -95,46 +106,103 @@ def tugtglUI():
     else:
         pbkstate()
 
+
 def jetwaytglUI():
     jetwaytgl()
 
+
+def startAll():
+    global settings
+    global settooltip
+    try:
+        settings = json.load(open("settings.json"))
+        if settings["tooltips"] is True:
+            settooltip = " \u2713"
+        elif settings["tooltips"] is False:
+            settooltip = ""
+    except:
+        settings = {"tooltips": True, "sound": True, "brakes": False, "uiclose": False, "jetclose": False, "control": "modern", "path": os.path.realpath(__file__)}
+        if settings["tooltips"] is True:
+            settooltip = " \u2713"
+        elif settings["tooltips"] is False:
+            settooltip = ""
+        try:
+            json.dump(settings, open("settings.json", 'w'))
+        except:
+            logging.error(os.path.realpath(__file__)+" settings.json write permissions denied")
+            ## TODO: Save into user directory to avoid error
+        
+        
+
+## TODO: to be deleted soon
 def restartAll():
-    smcheck.join()
-    sm.exit()
-    os.execv(sys.executable, ['python'] + sys.argv)
+    if (smconnected == 1):
+        smcheck.join()
+        sm.exit()
+        logging.info("SimConnect:Clean exit")
+    os.execv(sys.executable, ['python'] + sys.argv)   
+    logging.info("APP:Restart")
     os._exit(0)
 
+def exitAll():
+    if (smconnected == 1):
+        smcheck.join()
+        sm.exit()
+        logging.info("SimConnect:Clean exit")
+    logging.info("APP:Exit")
+    os._exit(0)
+
+
 def resetUI():
-    btn1["state"] =  NORMAL
+    pbstp = 0
+    recphase = False
+    rec = 2
+    btn1["state"] = NORMAL
     btn1["fg"] = "white"
     btn1["bg"] = "#6B6B6B"
     btn1["text"] = "Auto-Push Back"
-    btn2["state"] =  NORMAL
+    btn2["state"] = NORMAL
     btn2["fg"] = "white"
     btn2["bg"] = "#6B6B6B"
-    btn3["state"] =  NORMAL
+    btn3["state"] = NORMAL
     btn3["fg"] = "white"
     btn3["bg"] = "#6B6B6B"
     btn3["text"] = "Record Push Back"
-    btn4["state"] =  DISABLED
+    btn4["state"] = DISABLED
     btn4["fg"] = "white"
     btn4["bg"] = "white"
-    btn5["state"] =  NORMAL
+    btn5["state"] = NORMAL
     btn5["fg"] = "white"
     btn5["bg"] = "#6B6B6B"
     logging.info("UI Reset -> Back to main page")
 
+
+def aboutClickFunction():
+    webbrowser.open("https://github.com/RushScript/MSFS-PBR")
+
+def tooltips():
+    if settings["tooltips"] is True:
+        settings["tooltips"] = False
+        settingsmenu.entryconfigure(1, label="Sim-Tooltips")
+        json.dump(settings, open("settings.json", 'w'))
+    elif settings["tooltips"] is False:
+        settings["tooltips"] = True
+        settingsmenu.entryconfigure(1, label="Sim-Tooltips \u2713")
+        json.dump(settings, open("settings.json", 'w'))
+
+
 ## Core functions
 # Simconnect link
-def simconnectLink() :
+def simconnectLink():
     global sm
-    global simconnected
+    global smconnected
     global aq
     global ae
     global tug
+    global tugspd
     global tugtgl
     global jetwaytgl
-    #Local var used to loop on SimConnect link attempt
+    # Local var used to loop on SimConnect link attempt
     smconnected = 0
     logging.info("SimConnect:Linking to MSFS2020...")
     while True:
@@ -153,9 +221,10 @@ def simconnectLink() :
                 logging.info("SimConnect:Linked")
                 lbl2["fg"] = "#adf542"
                 lbl2["text"] = "SimConnect: Linked"
-                aq = AircraftRequests(sm) #Aircraft Requests Variable
-                ae = AircraftEvents(sm) # Aircraft Event Variables
+                aq = AircraftRequests(sm,  _time=10)  # Aircraft Requests Variable
+                ae = AircraftEvents(sm)  # Aircraft Event Variables
                 tug = ae.find("KEY_TUG_HEADING")
+                tugspd = ae.find("KEY_TUG_SPEED")
                 tugtgl = ae.find("TOGGLE_PUSHBACK")
                 jetwaytgl = ae.find("TOGGLE_JETWAY")
                 return (sm)
@@ -166,51 +235,58 @@ def simconnectLink() :
                 logging.info("Retrying in 10sec")
                 continue
 
+
 # Manual Push Back
 def pb():
     recphase = False
-    keyboard.add_hotkey("left", lambda:tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))-27)%360*11930464)))
-    keyboard.add_hotkey("left", lambda:heading('left'))
-    keyboard.add_hotkey("right", lambda:tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))+27)%360*11930464)))
-    keyboard.add_hotkey("right", lambda:heading('right'))
-    keyboard.add_hotkey("up", lambda:pbst())
-    keyboard.add_hotkey("down", lambda:tugtgl())
-    keyboard.add_hotkey("down", lambda:pbkstate())
+    logging.info("Manual Push Back started")
+    keyboard.add_hotkey("left",
+                        lambda: tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) - 27) % 360 * 11930464)))
+    keyboard.add_hotkey("left", lambda: heading('left'))
+    keyboard.add_hotkey("right",
+                        lambda: tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) + 27) % 360 * 11930464)))
+    keyboard.add_hotkey("right", lambda: heading('right'))
+    keyboard.add_hotkey("up", lambda: pbst())
+    keyboard.add_hotkey("down", lambda: tugtgl())
     return
 
-# Record Push Back 
+
+# Record Push Back
 def pbrec(fpath):
     global recphase
     global recdata
     recphase = True
     recdata = []
-    recdata.append(str(aq.get("PLANE_LATITUDE"))+"\n")
-    recdata.append(str(aq.get("PLANE_LONGITUDE"))+"\n")
-    recdata.append(str(aq.get("PLANE_HEADING_DEGREES_TRUE"))+"\n")
+    recdata.append(str(aq.get("PLANE_LATITUDE")) + "\n")
+    recdata.append(str(aq.get("PLANE_LONGITUDE")) + "\n")
+    recdata.append(str(aq.get("PLANE_HEADING_DEGREES_TRUE")) + "\n")
     pbr = open(fpath, 'w')
     logging.info("Record Push Back started")
-    #pbr = open(recdata[0].replace('\n', '').replace('.', '')+recdata[1].replace('\n', '').replace('.', '')+'.pbr', 'w')
-    keyboard.add_hotkey("left", lambda:tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))-27)%360*11930464)))
-    keyboard.add_hotkey("left", lambda:heading('left'))
-    keyboard.add_hotkey("right", lambda:tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))+27)%360*11930464)))
-    keyboard.add_hotkey("right", lambda:heading('right'))
-    keyboard.add_hotkey("up", lambda:pbst())
-    keyboard.add_hotkey("down", lambda:tugtgl())
-    keyboard.add_hotkey("down", lambda:recstate())
+    # pbr = open(recdata[0].replace('\n', '').replace('.', '')+recdata[1].replace('\n', '').replace('.', '')+'.pbr', 'w')
+    keyboard.add_hotkey("left",
+                        lambda: tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) - 27) % 360 * 11930464)))
+    keyboard.add_hotkey("left", lambda: heading('left'))
+    keyboard.add_hotkey("right",
+                        lambda: tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) + 27) % 360 * 11930464)))
+    keyboard.add_hotkey("right", lambda: heading('right'))
+    keyboard.add_hotkey("up", lambda: pbst())
+    keyboard.add_hotkey("down", lambda: tugtgl())
     while rec > 0:
         try:
             if aq.get("GROUND_VELOCITY") > 0.1:
                 time.sleep(rft)
-                recdata.append(str(int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))%360*11930464))+"\n")
+                recdata.append(str(int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")) % 360 * 11930464)) + "\n")
         except:
             logging.warning("aq.get(""GROUND_VELOCITY"") return null")
+    tugspd(0)
     pbr.writelines(recdata)
     pbr.close()
-    logging.info("Push back recorded and saved to file: "+fpath)
-    sm.sendText("Push back recorded and saved to file: "+fpath)
+    logging.info("Push back recorded and saved to file: " + fpath)
+    sm.sendText("Push back recorded and saved to file: " + fpath)
     logging.info("Record Push Back ended")
     time.sleep(2)
     resetUI()
+
 
 # Push Back state
 def recstate():
@@ -221,20 +297,20 @@ def recstate():
         sm.sendText("Recording Push back...")
     return rec
 
-# Auto-Push Back 
+
+# Auto-Push Back
 def pbplay(fpath):
     recphase = False
-    pbrd = open(fpath, 'r') 
+    pbrd = open(fpath, 'r')
     Lines = pbrd.readlines()
     aq.set("PLANE_LATITUDE", float(Lines[0]))
     aq.set("PLANE_LONGITUDE", float(Lines[1]))
     aq.set("PLANE_HEADING_DEGREES_TRUE", float(Lines[2]))
-    logging.info("Applying -> Lat: "+str(Lines[0]).replace("\n", ""))
-    logging.info("Applying -> Lon: "+str(Lines[1]).replace("\n", ""))
-    logging.info("Applying -> Hdg: "+str(Lines[2]).replace("\n", ""))
+    logging.info("Applying -> Lat: " + str(Lines[0]).replace("\n", ""))
+    logging.info("Applying -> Lon: " + str(Lines[1]).replace("\n", ""))
+    logging.info("Applying -> Hdg: " + str(Lines[2]).replace("\n", ""))
     time.sleep(2)
-    keyboard.add_hotkey("down", lambda:tugtgl())
-    keyboard.add_hotkey("down", lambda:pbkstate())
+    keyboard.add_hotkey("down", lambda: tugtgl())
     count = 0
     contact = 1
     while contact > 0:
@@ -244,7 +320,7 @@ def pbplay(fpath):
         except:
             pass
     logging.info("Auto-Push back started")
-    btn4["state"] =  DISABLED
+    btn4["state"] = DISABLED
     btn4["bg"] = "white"
     btn4["fg"] = "#6B6B6B"
     for line in Lines:
@@ -256,21 +332,24 @@ def pbplay(fpath):
     tugtgl()
     logging.info("Auto-Push back ended")
     pbkstate()
-   
+
+
 # Push Back last steering direction 
 def pbst():
     tug = ae.find("KEY_TUG_HEADING")
     if (hdg == "left"):
-        tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))-3)%360*11930464))
+        tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) - 3) % 360 * 11930464))
     elif (hdg == "right"):
-        tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE")))+3)%360*11930464))
+        tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) + 3) % 360 * 11930464))
     return
+
 
 # Push Back last heading update
 def heading(trn):
     global hdg
     hdg = trn
     return hdg
+
 
 ## TODO: change def pbkstate to def pbnotify
 # Push Back SM notification (Parking Brakes)
@@ -281,18 +360,18 @@ def pbkstate():
         pbstp = 1
     else:
         sm.sendText("Set parking brakes")
+        tugspd(0)
         pbstp = 0
         time.sleep(2)
         resetUI()
 
+startAll()
 
-
-    
 # GUI creation
 root = Tk()
 
 # Creates main window
-root.geometry('395x390')
+root.geometry('400x390')
 root.configure(background='#6B6B6B')
 root.title('Push Back Recorder')
 root.resizable(width=False, height=False)
@@ -300,6 +379,21 @@ root.attributes('-topmost', True)
 root.iconbitmap(default="AppIcon.ico")
 root.update()
 
+# Menu Bar
+global settingsmenu
+menubar = Menu(root)
+menubar = Menu(root)
+filemenu = Menu(menubar, tearoff=0)
+filemenu.add_command(label="Restart", command=restartAll)
+filemenu.add_separator()
+filemenu.add_command(label="Exit", command=exitAll)
+menubar.add_cascade(label="App", menu=filemenu)
+settingsmenu = Menu(menubar, tearoff=0)
+settingsmenu.add_command(label="Sim-Tooltips"+settooltip, command=tooltips)
+menubar.add_cascade(label="Settings", menu=settingsmenu)
+helpmenu = Menu(menubar, tearoff=0)
+helpmenu.add_command(label="About...", command=aboutClickFunction)
+menubar.add_cascade(label="Help", menu=helpmenu)
 
 # GUI Buttons
 global btn1
@@ -309,76 +403,72 @@ global btn4
 global btn5
 
 # Creates Main Page buttons 
-btn1 = Button(root, text='Auto-Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction)
+btn1 = Button(root, text='Auto-Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
+              command=btnClickFunction)
 btn1.place(x=5, y=10)
-btn2 = Button(root, text='Manual Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
+btn2 = Button(root, text='Manual Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
+              command=btnClickFunction2)
 btn2.place(x=5, y=50)
-btn3 = Button(root, text='Record Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction3)
+btn3 = Button(root, text='Record Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
+              command=btnClickFunction3)
 btn3.place(x=5, y=90)
-btn4 = Button(root, text='Toggle / Push Back', state=DISABLED, bg='white', fg="white", font=('arial', 10, 'normal'), command=tugtglUI)
+btn4 = Button(root, text='Toggle / Push Back', state=DISABLED, bg='white', fg="white", font=('arial', 10, 'normal'),
+              command=tugtglUI)
 btn4.place(x=135, y=10)
 btn5 = Button(root, text='Toggle / Jetway', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=jetwaytglUI)
 btn5.place(x=135, y=50)
 
 # Declares Auto-Push Back buttons
-btnapb1 = Button(root, text='Click to start Auto-Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
-btnapb2 = Button(root, text='Toggle / Jetway', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
-btnpb1 = Button(root, text='Stop Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=btnClickFunction2)
+btnapb1 = Button(root, text='Click to start Auto-Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
+                 command=btnClickFunction2)
+btnapb2 = Button(root, text='Toggle / Jetway', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
+                 command=btnClickFunction2)
+btnpb1 = Button(root, text='Stop Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
+                command=btnClickFunction2)
 
 # GUI Canvas images
 global HowToImg
 global HowToImgTail
 
 # Creates "How to manual push back" canvas image 
-HowToImg= Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
-picture_file = PhotoImage(file = 'howto.gif')
+HowToImg = Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
+picture_file = PhotoImage(file='howto.gif')
 HowToImg.create_image(380, 0, anchor=NE, image=picture_file)
 HowToImg.place(x=5, y=152)
 
 # Declares "How to auto-push back" canvas image
-HowToImgTail= Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
-picture_fileT = PhotoImage(file = 'howtoTail.gif')
+HowToImgTail = Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
+picture_fileT = PhotoImage(file='howtoTail.gif')
 HowToImgTail.create_image(380, 0, anchor=NE, image=picture_fileT)
 # Creates "Logo" canvas image
 
-Logo= Canvas(root, height=100, width=100, bd=0, highlightthickness=0, relief='ridge')
-picture_fileL = PhotoImage(file = 'logo.gif')  
+Logo = Canvas(root, height=100, width=100, bd=0, highlightthickness=0, relief='ridge')
+picture_fileL = PhotoImage(file='logo.gif')
 Logo.create_image(100, 0, anchor=NE, image=picture_fileL)
 Logo.place(x=285, y=0)
-
 
 # GUI Labels
 global lbl1
 global lbl2
 # Creates Main Page labels
-lbl1 = Label(root, text='* Remember to keep this window focused while using manual/record push back', bg='#6B6B6B', fg="#ffc000", font=('arial', 7, 'normal'))
+lbl1 = Label(root, text='* Remember to keep this window focused while using manual/record push back', bg='#6B6B6B',
+             fg="#ffc000", font=('arial', 8, 'normal'))
 lbl1.place(x=5, y=362)
 lbl2 = Label(root, text='SimConnect: Not linked', bg='#6B6B6B', fg="#ffc000", font=('arial', 9, 'normal'))
 lbl2.place(x=250, y=83)
 
-
 # Declares a new thread for simconnectLink
 smcheck = threading.Thread(target=simconnectLink)
 
-
-# Global variables
-global recphase
-recphase = False
-#Local variables
+# Local variables
 hdg = ""
 pbstp = 0
+recphase = False
 rec = 2
-rft = 0.300 # Refresh rate
-erft = 15   #Error Bug refresh rate
-
+rft = 0.300  # Refresh rate
+erft = 15  # Error Bug refresh rate
 
 smcheck.start()
+root.config(menu=menubar)
 root.mainloop()
-smcheck.join()
-logging.info("GUI:Exit")
-try:
-    sm.exit()
-except:
-    pass
-logging.info("SimConnect:Clean exit")
-os._exit(0)
+exitAll()

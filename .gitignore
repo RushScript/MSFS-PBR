@@ -133,3 +133,6 @@ dmypy.json
 
 # Work-in-progress PY
 *WIP.py
+
+# PBR settings json
+settings.json

@@ -3,6 +3,16 @@
 
 -- [FIX] Fixed PBR showing Tip message in MSFS2020 "Recording push back..." while using Manual Push back and Auto-Push back feature
 
--- [FIX] Record Push Back being not able to record
+-- [FIX] Record Push Back being not able to record 
 
--- [ADD] Added App icon
+-- [FIX] Auto-Push back GUI not working after recording (There is no need to reset the PBR App to use any other feature)
+
+-- [FIX] Push back tug releases the plane without slowing down first (It will now slowdown the plane and then release the nose)
+
+-- [IMPROVE] Improved GUI performance
+
+-- [ADD] Added new app icon
+
+-- [ADD] Added GUI Menu bar
+
+-- [ADD] Tooltips can now be disabled (Check for settings on the UI menu bar)
