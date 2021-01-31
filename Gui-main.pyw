@@ -276,7 +276,8 @@ def pbrec(fpath):
     pbr.writelines(recdata)
     pbr.close()
     logging.info("Push back recorded and saved to file: " + fpath)
-    sm.sendText("Push back recorded and saved to file: " + fpath)
+    if settings["tooltips"] is True:
+        sm.sendText("Push back recorded and saved to file: " + fpath)
     logging.info("Record Push Back ended")
     time.sleep(2)
     resetUI()
@@ -285,7 +286,7 @@ def pbrec(fpath):
 def recstate():
     global rec
     rec = rec - 1
-    if (rec == 1):
+    if rec == 1 and settings["tooltips"] is True:
         sm.sendText("Release parking brakes")
         sm.sendText("Recording Push back...")
     return rec
@@ -345,10 +346,12 @@ def heading(trn):
 def pbkstate():
     global pbstp
     if (pbstp == 0):
-        sm.sendText("Release parking brakes")
+        if settings["tooltips"] is True:
+            sm.sendText("Release parking brakes")
         pbstp = 1
     else:
-        sm.sendText("Set parking brakes")
+        if settings["tooltips"] is True:
+            sm.sendText("Set parking brakes")
         tugspd(0)
         pbstp = 0
         time.sleep(2)
