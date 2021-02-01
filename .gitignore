@@ -136,3 +136,7 @@ dmypy.json
 
 # PBR settings json
 settings.json
+
+# PBR Build files
+build.spec
+build.cmd

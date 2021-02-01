@@ -9,6 +9,8 @@
 
 -- [FIX] Push back tug releases the plane without slowing down first (It will now slowdown the plane and then release the nose)
 
+-- [FIX] Added compiled EXE AV whitelisted (You can uninstall Python 3.8.7 from yout system if you whish)
+
 -- [IMPROVE] Improved GUI performance
 
 -- [ADD] Added new app icon
