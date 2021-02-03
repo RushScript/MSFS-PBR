@@ -7,9 +7,13 @@
 
 -- [FIX] Auto-Push back GUI not working after recording (There is no need to reset the PBR App to use any other feature)
 
--- [FIX] Push back tug releases the plane without slowing down first (It will now slowdown the plane and then release the nose)
+-- [FIX] Push back tug releases the plane without slowing down first (It will now slowdown the plane on release)
 
--- [FIX] Added compiled EXE AV whitelisted (You can uninstall Python 3.8.7 from yout system if you whish)
+-- [FIX] Change installer compression to LZMA2 to avoid AV false positives
+
+-- [FIX] Installer shortcuts fixed (Users can now pin the icon to the taskbar)
+
+-- [FIX] PBR now remembers the last accessed path
 
 -- [IMPROVE] Improved GUI performance
 

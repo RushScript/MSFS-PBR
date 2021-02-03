@@ -25,13 +25,20 @@ def customDialog(title, text, strings=('YES', 'NO'), bitmap='question', default=
     print(strings[d.num])
     return strings[d.num]
 
+# Get the last accessed path
+def getDirPath(dirpath):
+    path, filename = os.path.split(dirpath)
+    return path
+
 # Button 1 function
 def btnClickFunction():
-    root.filename = filedialog.askopenfilename(initialdir=os.path.dirname(os.path.realpath(__file__)),
+    root.filename = filedialog.askopenfilename(initialdir=settings["path"],
                                                title="Select your PBR file",
                                                filetypes=(("PBR files", "*.pbr"), ("all files", "*.*")))
     fpath = root.filename
     if fpath:
+        settings["path"] = getDirPath(fpath)
+        json.dump(settings, open("settings.json", 'w'))
         btn1["state"] = DISABLED
         btn2["state"] = DISABLED
         btn3["state"] = DISABLED
@@ -68,7 +75,7 @@ def btnClickFunction2():
 # Button 3 function
 def btnClickFunction3():
     ## TODO: Filename bug
-    root.filename = filedialog.asksaveasfilename(initialdir=os.path.dirname(os.path.realpath(__file__)),
+    root.filename = filedialog.asksaveasfilename(initialdir=settings["path"],
                                                  title="Select your PBR file",
                                                  filetypes=(("PBR files", "*.pbr"), ("all files", "*.*")))
     if root.filename:
@@ -76,6 +83,8 @@ def btnClickFunction3():
             fpath = root.filename
         else:
             fpath = root.filename + ".pbr"
+        settings["path"] = getDirPath(fpath)
+        json.dump(settings, open("settings.json", 'w'))
         btn1["state"] = DISABLED
         btn2["state"] = DISABLED
         btn3["state"] = DISABLED
@@ -117,7 +126,7 @@ def startAll():
         elif settings["tooltips"] is False:
             settooltip = ""
     except:
-        settings = {"tooltips": True, "sound": True, "brakes": False, "uiclose": False, "jetclose": False, "control": "modern", "path": os.path.realpath(__file__)}
+        settings = {"tooltips": True, "sound": True, "brakes": False, "uiclose": False, "jetclose": False, "control": "modern", "path": getDirPath(os.path.realpath(__file__))}
         if settings["tooltips"] is True:
             settooltip = " \u2713"
         elif settings["tooltips"] is False:
@@ -186,7 +195,7 @@ def tooltips():
         settings["tooltips"] = True
         settingsmenu.entryconfigure(1, label="Sim-Tooltips \u2713")
         json.dump(settings, open("settings.json", 'w'))
-
+    
 ## Core functions
 # Simconnect link
 def simconnectLink():
