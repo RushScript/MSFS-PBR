@@ -134,8 +134,8 @@ dmypy.json
 # Work-in-progress PY
 *WIP.py
 
-# PBR settings json
-settings.json
+# PBR config
+*.config
 
 # PBR Build files
 build.spec

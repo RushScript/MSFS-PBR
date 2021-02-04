@@ -33,27 +33,46 @@ def getDirPath(dirpath):
 # Button 1 function
 def btnClickFunction():
     root.filename = filedialog.askopenfilename(initialdir=settings["path"],
-                                               title="Select your PBR file",
-                                               filetypes=(("PBR files", "*.pbr"), ("all files", "*.*")))
+                                               title="Select your Push Back Recorder file",
+                                               filetypes=(("Record file", "*.pbr"), ("Template file", "*.pbt")))
     fpath = root.filename
     if fpath:
         settings["path"] = getDirPath(fpath)
         json.dump(settings, open("pbr.config", 'w'))
-        btn1["state"] = DISABLED
-        btn2["state"] = DISABLED
-        btn3["state"] = DISABLED
-        btn4["state"] = NORMAL
-        btn1["bg"] = "#adf542"
-        btn1["fg"] = "#6B6B6B"
-        btn2["bg"] = "white"
-        btn2["fg"] = "#6B6B6B"
-        btn3["bg"] = "white"
-        btn3["fg"] = "#6B6B6B"
-        btn4["bg"] = "#6B6B6B"
-        btn1["text"] = "PBR File loaded"
-        logging.info("Auto-Push back PBR file loaded: " + fpath)
-        pbplayThd = threading.Thread(target=pbplay, args=(fpath,))
-        pbplayThd.start()
+        if str(fpath).find(".pbr") != -1:
+            btn1["state"] = DISABLED
+            btn2["state"] = DISABLED
+            btn3["state"] = DISABLED
+            btn4["state"] = NORMAL
+            btn1["bg"] = "#adf542"
+            btn1["fg"] = "#6B6B6B"
+            btn2["bg"] = "white"
+            btn2["fg"] = "#6B6B6B"
+            btn3["bg"] = "white"
+            btn3["fg"] = "#6B6B6B"
+            btn4["bg"] = "#6B6B6B"
+            btn1["text"] = "PBR File loaded"
+            logging.info("Auto-Push back PBR file loaded: " + fpath)
+            pbplayThd = threading.Thread(target=pbplay, args=(fpath,))
+            pbplayThd.start()
+        elif str(fpath).find(".pbt") != -1:
+            btn1["state"] = DISABLED
+            btn2["state"] = DISABLED
+            btn3["state"] = DISABLED
+            btn4["state"] = NORMAL
+            btn1["bg"] = "#adf542"
+            btn1["fg"] = "#6B6B6B"
+            btn2["bg"] = "white"
+            btn2["fg"] = "#6B6B6B"
+            btn3["bg"] = "white"
+            btn3["fg"] = "#6B6B6B"
+            btn4["bg"] = "#6B6B6B"
+            btn1["text"] = "PBT File loaded"
+            logging.info("Auto-Push back PBT file loaded: " + fpath)
+            pbplayTemplateThd = threading.Thread(target=pbplayT, args=(fpath,))
+            pbplayTemplateThd.start()
+        else:
+            logging.warning("Invalid Auto-Push back PBR file")
     else:
         logging.info("Auto-Push back PBR file loaded: Cancelled by user input")
 
@@ -230,6 +249,7 @@ def simconnectLink():
     global tugtgl
     global jetwaytgl
     global pkbrakes
+    global freezetgl
     # Local var used to loop on SimConnect link attempt
     smconnected = 0
     logging.info("SimConnect:Linking to MSFS2020...")
@@ -256,6 +276,7 @@ def simconnectLink():
                 tugtgl = ae.find("TOGGLE_PUSHBACK")
                 jetwaytgl = ae.find("TOGGLE_JETWAY")
                 pkbrakes = ae.find("PARKING_BRAKES")
+                freezetgl = ae.find("FREEZE_LATITUDE_LONGITUDE_TOGGLE")
                 return (sm)
             except:
                 time.sleep(10)
@@ -338,7 +359,7 @@ def recstate():
         sm.sendText("Recording Push back...")
     return rec
 
-# Auto-Push Back
+# Auto-Push Back PBR File
 def pbplay(fpath):
     recphase = False
     pbrd = open(fpath, 'r')
@@ -349,7 +370,7 @@ def pbplay(fpath):
     logging.info("Applying -> Lat: " + str(Lines[0]).replace("\n", ""))
     logging.info("Applying -> Lon: " + str(Lines[1]).replace("\n", ""))
     logging.info("Applying -> Hdg: " + str(Lines[2]).replace("\n", ""))
-    time.sleep(2)
+    time.sleep(1)
     keyboard.add_hotkey("down", lambda: tugtglUI())
     count = 0
     contact = 1
@@ -381,6 +402,65 @@ def pbplay(fpath):
     tugtgl()
     logging.info("Auto-Push back ended")
     pbkstate()
+
+# Auto-Push Back PBT File
+def pbplayT(fpath):
+    recphase = False
+    pbt = json.load(open(fpath))
+    time.sleep(1)
+    steps = 0
+    keyboard.add_hotkey("down", lambda: tugtglUI())
+    contact = 1
+    feets = 0
+    while contact > 0:
+        gs = aq.find("GROUND_VELOCITY")
+        gs.time = smrft
+        gs = aq.get("GROUND_VELOCITY")
+        pbk = aq.find("BRAKE_PARKING_INDICATOR")
+        pbk.time = smrft
+        pbk = aq.get("BRAKE_PARKING_INDICATOR")
+        try:
+            if gs > 0.1:
+                freezetgl()
+                contact = -1
+        except:
+            logging.warning("aq.get(""GROUND_VELOCITY"") return null")
+            pass
+    while contact < 0:
+        pbk = aq.find("BRAKE_PARKING_INDICATOR")
+        pbk.time = smrft
+        pbk = aq.get("BRAKE_PARKING_INDICATOR")
+        time.sleep(1)
+        try:
+            if pbk < 1.0:
+                freezetgl()
+                contact = 0
+        except:
+            logging.warning("aq.get(""BRAKE_PARKING_INDICATOR"") return null")
+            pass          
+    logging.info("Auto-Push back template started")
+    btn4["state"] = DISABLED
+    btn4["bg"] = "white"
+    btn4["fg"] = "#6B6B6B"
+    while steps <= pbt["steps"][0]:  
+        feets += gs       
+        if feets >= pbt["feets"][steps] * 10:
+            if (pbt["direction"][steps] == "left"):
+                tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) - pbt["heading"][steps]) % 360 * 11930464))
+            if (pbt["direction"][steps] == "right"):
+                tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) + pbt["heading"][steps]) % 360 * 11930464))
+            else:
+                pass
+            steps += 1
+            if (steps == 3):
+                break
+        print("STEP:", steps)
+        print("FEETS:", feets)
+        time.sleep(smrft)
+    tugtgl()
+    logging.info("Auto-Push back template ended")
+    pbkstate()
+
 
 # Push Back last steering direction 
 def pbst():
