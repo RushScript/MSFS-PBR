@@ -145,7 +145,7 @@ def startAll():
         elif settings["tooltips"] is False:
             settooltip = ""
     except:
-        settings = {"tooltips": True, "sound": True, "brakes": False, "uiclose": False, "jetclose": False, "control": "modern", "path": getDirPath(os.path.realpath(__file__)), "uipos": ""}
+        settings = {"tooltips": True, "sound": True, "brakes": False, "uiclose": False, "jetclose": False, "control": "modern", "path": getDirPath(os.path.realpath(__file__))+"\\PBR", "uipos": ""}
         if settings["tooltips"] is True:
             settooltip = " \u2713"
         elif settings["tooltips"] is False:
@@ -159,6 +159,7 @@ def startAll():
 ## TODO: to be deleted soon
 # Restarts the whole script 
 def restartAll():
+    global smconnected
     if root.winfo_x() > 0:
         x = "+"+str(root.winfo_x())
     else:
@@ -173,12 +174,16 @@ def restartAll():
         smcheck.join()
         sm.exit()
         logging.info("SimConnect:Clean exit")
-    os.execv(sys.executable, ['python'] + sys.argv)   
+    try:
+        os.execv(sys.executable, ['python'] + sys.argv)   
+    except:
+        logging.error("os.execv(sys.executable, ['python'] + sys.argv) - Could not restart the App")
     logging.info("APP:Restart")
     os._exit(0)
 
 # On exit GUI function
 def exitAll():
+    global smconnected
     if root.winfo_x() > 0:
         x = "+"+str(root.winfo_x())
     else:
@@ -198,11 +203,29 @@ def exitAll():
 
 # Resets the GUI to the default page
 def resetUI():
+    global settings
+    global settooltip
+    global smconnected
+    global recdata
+    global phdgbl
+    global rec
+    global alltime
+    global start
+    global stp
+    global hdg
+    global steps
+    stp = 0
+    start = 0
+    alltime = 0
     hdg = ""
-    pbstp = 0
     recphase = False
     rec = 2
-    recdata.clear()
+    steps = 0
+    phdgbl = 0
+    try:
+        recdata.clear()
+    except:
+        pass
     btn1["state"] = NORMAL
     btn1["fg"] = "white"
     btn1["bg"] = "#6B6B6B"
@@ -287,6 +310,7 @@ def simconnectLink():
 
 # Manual Push Back
 def pb():
+    global recphase
     recphase = False
     logging.info("Manual Push Back started")
     keyboard.add_hotkey("left",
@@ -304,21 +328,21 @@ def pbrec(fpath):
     global recphase
     global recdata
     global phdgbl
+    global rec
+    global alltime
+    global start
+    global stp
+    stp = 0
+    start = 0
+    alltime = 0
+    contact = 0
     recphase = True
-    recdata = []
-    recdata.append(str(aq.get("PLANE_LATITUDE")) + "\n")
-    recdata.append(str(aq.get("PLANE_LONGITUDE")) + "\n")
-    recdata.append(str(aq.get("PLANE_HEADING_DEGREES_TRUE")) + "\n")
-    pbr = open(fpath, 'w')
+    recdata = {"longitude": [], "latitude": [], "trueheading": [], "steps": [], "heading": [], "time": [], "direction": [], "heading": []}
+    recdata["longitude"].append(aq.get("PLANE_LONGITUDE"))
+    recdata["latitude"].append(aq.get("PLANE_LATITUDE"))
+    recdata["trueheading"].append(aq.get("PLANE_HEADING_DEGREES_TRUE"))
     logging.info("Record Push Back started")
     # pbr = open(recdata[0].replace('\n', '').replace('.', '')+recdata[1].replace('\n', '').replace('.', '')+'.pbr', 'w')
-    keyboard.add_hotkey("left",
-                        lambda: tug(((int(math.degrees(phdgbl)) - 27) % 360 * 11930464)))
-    keyboard.add_hotkey("left", lambda: heading('left'))
-    keyboard.add_hotkey("right",
-                        lambda: tug(((int(math.degrees(phdgbl)) + 27) % 360 * 11930464)))
-    keyboard.add_hotkey("right", lambda: heading('right'))
-    keyboard.add_hotkey("up", lambda: pbst())
     keyboard.add_hotkey("down", lambda: tugtglUI())
     while rec > 0:
         gs = aq.find("GROUND_VELOCITY")
@@ -330,25 +354,49 @@ def pbrec(fpath):
         phd = aq.find("PLANE_HEADING_DEGREES_TRUE")
         phd.time = smrft
         phd = aq.get("PLANE_HEADING_DEGREES_TRUE")
+        phdgbl = phd
         try:
             if gs > 0.1:
-                if (pbk == 1.0):
-                    pkbrakes()    
-                time.sleep(wft)
-                phdgbl = phd
-                recdata.append(str(int(math.degrees(phdgbl) % 360 * 11930464)) + "\n")
+                if (contact == 0):
+                    freezetgl()
+                while (pbk > 0.0):
+                    pbk = aq.find("BRAKE_PARKING_INDICATOR")
+                    pbk.time = smrft
+                    pbk = aq.get("BRAKE_PARKING_INDICATOR")
+                    if (pbk < 1.0):
+                        contact = 1
+                        freezetgl()
+                        start = time.time()
+                        logging.info("Tick-Timer started")
+                        keyboard.add_hotkey("left", lambda: stprec(alltime, "left"))
+                        keyboard.add_hotkey("left", lambda: heading('left'))
+                        keyboard.add_hotkey("right", lambda: stprec(alltime, "right"))
+                        keyboard.add_hotkey("right", lambda: heading('right'))
+                        keyboard.add_hotkey("up", lambda: stprec(alltime, "straight"))
+                        keyboard.add_hotkey("down", lambda: stprec(alltime, "stop"))
+                    time.sleep(1)
+                alltime =+ time.time() - start
         except:
             logging.warning("aq.get(""GROUND_VELOCITY"") return null")
             pass
+        time.sleep(smrft / 1000)
     tugspd(0)
-    pbr.writelines(recdata)
-    pbr.close()
+    tugtgl()
+    freezetgl()
+    while (pbk < 1.0):
+        pbk = aq.find("BRAKE_PARKING_INDICATOR")
+        pbk.time = smrft
+        pbk = aq.get("BRAKE_PARKING_INDICATOR")
+        if (pbk > 0.0):
+            freezetgl()
+            tugtgl()
+        time.sleep(1)
+    json.dump(recdata, open(fpath, 'w'))
     logging.info("Push back recorded and saved to file: " + fpath)
     if settings["tooltips"] is True:
         sm.sendText("Push back recorded and saved to file: " + fpath)
     logging.info("Record Push Back ended")
-    time.sleep(2)
-    restartAll()
+    resetUI()
 
 # Push Back rec state
 def recstate():
@@ -359,52 +407,129 @@ def recstate():
         sm.sendText("Recording Push back...")
     return rec
 
+def stprec(rectime, turn):
+    global stp
+    global rec
+    global hdg
+    global phdgbl
+    global recdata
+    if (turn == "left"):
+        tug(((int(math.degrees(phdgbl)) - 27) % 360 * 11930464))
+        recdata["steps"] = stp
+        recdata["time"].append(rectime)
+        recdata["direction"].append(turn)
+        recdata["heading"].append(27)
+        stp += 1
+    elif (turn == "right"):
+        tug(((int(math.degrees(phdgbl)) + 27) % 360 * 11930464))
+        recdata["steps"] = stp
+        recdata["time"].append(rectime)
+        recdata["direction"].append(turn)
+        recdata["heading"].append(27)
+        stp += 1
+    elif (turn == "straight") and (hdg == "left"):
+        tug(((int(math.degrees(phdgbl)) - 3) % 360 * 11930464))
+        recdata["steps"] = stp
+        recdata["time"].append(rectime)
+        recdata["direction"].append(hdg)
+        recdata["heading"].append(3)
+        stp += 1
+    elif (turn == "straight") and (hdg == "right"):
+        tug(((int(math.degrees(phdgbl)) + 3) % 360 * 11930464))
+        recdata["steps"] = stp
+        recdata["time"].append(rectime)
+        recdata["direction"].append(hdg)
+        recdata["heading"].append(3)
+        stp += 1
+    elif (turn == "stop"):
+        if (rec == 0):
+            recdata["steps"] = stp
+            recdata["time"].append(rectime)
+            recdata["direction"].append("straight")
+            recdata["heading"].append(0)
+            stp = 0
+    time.sleep(1)
+    
 # Auto-Push Back PBR File
 def pbplay(fpath):
+    global start
+    global steps
+    global start
+    global recphase
     recphase = False
-    pbrd = open(fpath, 'r')
-    Lines = pbrd.readlines()
-    aq.set("PLANE_LATITUDE", float(Lines[0]))
-    aq.set("PLANE_LONGITUDE", float(Lines[1]))
-    aq.set("PLANE_HEADING_DEGREES_TRUE", float(Lines[2]))
-    logging.info("Applying -> Lat: " + str(Lines[0]).replace("\n", ""))
-    logging.info("Applying -> Lon: " + str(Lines[1]).replace("\n", ""))
-    logging.info("Applying -> Hdg: " + str(Lines[2]).replace("\n", ""))
+    pbr = json.load(open(fpath))
     time.sleep(1)
+    steps = 0
     keyboard.add_hotkey("down", lambda: tugtglUI())
-    count = 0
     contact = 1
+    start = 0
+    aq.set("PLANE_LATITUDE",  pbr["latitude"][0])
+    aq.set("PLANE_LONGITUDE", pbr["longitude"][0])
+    aq.set("PLANE_HEADING_DEGREES_TRUE", pbr["trueheading"][0])
     while contact > 0:
         gs = aq.find("GROUND_VELOCITY")
         gs.time = smrft
         gs = aq.get("GROUND_VELOCITY")
-        pbk = aq.find("BRAKE_PARKING_INDICATOR")
-        pbk.time = smrft
-        pbk = aq.get("BRAKE_PARKING_INDICATOR")
         try:
             if gs > 0.1:
-                if (pbk == 1.0):
-                    pkbrakes()
-                contact = 0
+                freezetgl()
+                contact = -1
         except:
             logging.warning("aq.get(""GROUND_VELOCITY"") return null")
             pass
-    logging.info("Auto-Push back started")
+    while contact < 0:
+        pbk = aq.find("BRAKE_PARKING_INDICATOR")
+        pbk.time = smrft
+        pbk = aq.get("BRAKE_PARKING_INDICATOR")
+        time.sleep(1)
+        try:
+            if pbk < 1.0:
+                freezetgl()
+                start = time.time()
+                logging.info("Tick-Timer started")
+                contact = 0
+        except:
+            logging.warning("aq.get(""BRAKE_PARKING_INDICATOR"") return null")
+            pass
+    logging.info("Auto-Push back template started")
     btn4["state"] = DISABLED
     btn4["bg"] = "white"
     btn4["fg"] = "#6B6B6B"
-    for line in Lines:
-        count += 1
-        if count > 3:
-            time.sleep(rft)
-            tug(int(line.strip()))
-    time.sleep(erft)
-    tugtgl()
-    logging.info("Auto-Push back ended")
+    while steps <= pbr["steps"]:
+        gs = aq.find("GROUND_VELOCITY")
+        gs.time = smrft
+        gs = aq.get("GROUND_VELOCITY")
+        if time.time() - start >= pbr["time"][steps]:
+            if (pbr["direction"][steps] == "left"):
+                tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) - pbr["heading"][steps]) % 360 * 11930464))
+            elif (pbr["direction"][steps] == "right"):
+                tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) + pbr["heading"][steps]) % 360 * 11930464))
+            else:
+                pass
+            steps += 1
+        #print("STEP:", steps)
+        time.sleep(smrft / 1000)
+    contact = -1
+    freezetgl()
+    while contact < 0:
+        pbk = aq.find("BRAKE_PARKING_INDICATOR")
+        pbk.time = smrft
+        pbk = aq.get("BRAKE_PARKING_INDICATOR")
+        time.sleep(1)
+        try:
+            if pbk > 0.0:
+                freezetgl()
+                contact = 0
+                tugtgl()
+        except:
+            logging.warning("aq.get(""BRAKE_PARKING_INDICATOR"") return null")
+            pass 
+    logging.info("Auto-Push back template ended")
     pbkstate()
 
 # Auto-Push Back PBT File
 def pbplayT(fpath):
+    global recphase
     recphase = False
     pbt = json.load(open(fpath))
     time.sleep(1)
@@ -416,9 +541,6 @@ def pbplayT(fpath):
         gs = aq.find("GROUND_VELOCITY")
         gs.time = smrft
         gs = aq.get("GROUND_VELOCITY")
-        pbk = aq.find("BRAKE_PARKING_INDICATOR")
-        pbk.time = smrft
-        pbk = aq.get("BRAKE_PARKING_INDICATOR")
         try:
             if gs > 0.1:
                 freezetgl()
@@ -442,25 +564,37 @@ def pbplayT(fpath):
     btn4["state"] = DISABLED
     btn4["bg"] = "white"
     btn4["fg"] = "#6B6B6B"
-    while steps <= pbt["steps"][0]:  
+    while steps < pbt["steps"][0] + 1:
+        gs = aq.find("GROUND_VELOCITY")
+        gs.time = smrft
+        gs = aq.get("GROUND_VELOCITY")
         feets += gs       
         if feets >= pbt["feets"][steps] * 10:
             if (pbt["direction"][steps] == "left"):
                 tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) - pbt["heading"][steps]) % 360 * 11930464))
-            if (pbt["direction"][steps] == "right"):
+            elif (pbt["direction"][steps] == "right"):
                 tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) + pbt["heading"][steps]) % 360 * 11930464))
             else:
                 pass
             steps += 1
-            if (steps == 3):
-                break
-        print("STEP:", steps)
-        print("FEETS:", feets)
-        time.sleep(smrft)
-    tugtgl()
+        time.sleep(smrft / 1000)
+    contact = -1
+    freezetgl()
+    while contact < 0:
+        pbk = aq.find("BRAKE_PARKING_INDICATOR")
+        pbk.time = smrft
+        pbk = aq.get("BRAKE_PARKING_INDICATOR")
+        time.sleep(1)
+        try:
+            if pbk > 0.0:
+                freezetgl()
+                contact = 0
+                tugtgl()
+        except:
+            logging.warning("aq.get(""BRAKE_PARKING_INDICATOR"") return null")
+            pass 
     logging.info("Auto-Push back template ended")
     pbkstate()
-
 
 # Push Back last steering direction 
 def pbst():
@@ -491,7 +625,7 @@ def pbkstate():
         tugspd(0)
         pbstp = 0
         time.sleep(2)
-        restartAll()
+        resetUI()
 
 ## Code sequence starts here
 startAll()
