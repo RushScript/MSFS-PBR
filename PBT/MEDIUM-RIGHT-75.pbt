@@ -3,5 +3,5 @@
 "feets": [115, 290], 
 "engines": [0, 0], 
 "direction": ["right", "straight"], 
-"heading": [90, 0]
+"heading": [75, 0]
 }

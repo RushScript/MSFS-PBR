@@ -1,7 +1,7 @@
 {
 "steps": [1], 
-"feets": [115, 290], 
+"feets": [178, 320], 
 "engines": [0, 0], 
 "direction": ["left", "straight"], 
-"heading": [90, 0]
+"heading": [75, 0]
 }

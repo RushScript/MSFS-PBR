@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import filedialog
 from tkinter import dialog
-import tkinter as tk
 from SimConnect import *
 import sys
 import os
@@ -24,87 +23,59 @@ LOGGER.info("START")
 def customDialog(title, text, strings=('YES', 'NO'), bitmap='question', default=1):
     d = dialog.Dialog(title=title, text=text, bitmap=bitmap, default=default, strings=strings)
     print(strings[d.num])
-    return strings[d.num]    
+    return strings[d.num]
 
 # Get the last accessed path
 def getDirPath(dirpath):
     path, filename = os.path.split(dirpath)
     return path
 
-def rbSelect():
-    global varselected
-    if (varselected.get() == 1):
-        pbtrb1.invoke()
-        print(varselected.get())
-
 # Button 1 function
 def btnClickFunction():
-    global pbtbtn1
-    global pbtbtn2
-    global pbtbtn3
-    global pbtbtn4
-    global pbtbtn5
-    global pbtbtn6
-    global pbtbtn7
-    global pbtbtn8
-    global plgbtn1
-    global plgbtn2
-    global plgbtn3
-    global pbtlbl1
-    global length
-    global pbtWindow
-    pbtWindow = tk.Toplevel(root)
-    try:
-        pbtWindow.geometry('400x550'+str(settings["uipos"][0])+str(settings["uipos"][1]))
-    except:
-        pbtWindow.geometry('400x550')
-    pbtWindow.configure(background='#6B6B6B')
-    pbtWindow.title('Planned Push Back')
-    pbtWindow.resizable(width=False, height=False)
-    pbtWindow.attributes('-topmost', True)
-    pbtWindow.iconbitmap(default="AppIcon.ico")
-    pbtbtn1image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn1.png")
-    pbtbtn2image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn2.png")
-    pbtbtn3image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn3.png")
-    pbtbtn4image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn4.png")
-    pbtbtn5image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn5.png")
-    pbtbtn6image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn6.png")
-    pbtbtn7image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn7.png")
-    pbtbtn8image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn8.png")
-    plgbtn1image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\plgbtn1.png")
-    plgbtn2image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\plgbtn2.png")
-    plgbtn3image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\plgbtn3.png")
-    pbtlbl1 = Label(pbtWindow, text='Select type of Push Back:', bg='#6B6B6B',
-             fg="#ffc000", font=('segoe ui', 16, 'normal'))
-    pbtlbl1.place(x=80, y=0)
-    pbtbtn1 = Button(pbtWindow, text='Play recorded Push Back', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn1image,
-              command=PBTbtnClickFunction)
-    pbtbtn2 = Button(pbtWindow, text='    Planned Push Back     ', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn2image,
-              command=PBTbtnClickFunction2)
-    pbtbtn3 = Button(pbtWindow, text='75° Left', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn3image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-LEFT-75.pbt"))
-    pbtbtn4 = Button(pbtWindow, text='75° Right', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn4image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-RIGHT-75.pbt"))
-    pbtbtn5 = Button(pbtWindow, text='90° Left', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn5image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-LEFT-90.pbt"))
-    pbtbtn6 = Button(pbtWindow, text='90° Right', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn6image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-RIGHT-90.pbt"))
-    pbtbtn7 = Button(pbtWindow, text='180° Left', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn7image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-LEFT-180.pbt"))
-    pbtbtn8 = Button(pbtWindow, text='180° Right', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn8image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-RIGHT-180.pbt"))
-    plgbtn1 = Button(pbtWindow, text='Short', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=plgbtn1image,
-              command=lambda: PBTbtnClickFunction3("SMALL"))
-    plgbtn2 = Button(pbtWindow, text='Medium', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=plgbtn2image,
-              command=lambda: PBTbtnClickFunction3("MEDIUM"))
-    plgbtn3 = Button(pbtWindow, text='Long', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=plgbtn3image,
-              command=lambda: PBTbtnClickFunction3("LARGE"))
-    pbtbtn1.place(x=120, y=115)
-    pbtbtn2.place(x=120, y=280)
-    pbtWindow.grab_set()
-    pbtWindow.mainloop()
-    pbtWindow.destroy()
-    
+    root.filename = filedialog.askopenfilename(initialdir=settings["path"],
+                                               title="Select your Push Back Recorder file",
+                                               filetypes=(("Record file", "*.pbr"), ("Template file", "*.pbt")))
+    fpath = root.filename
+    if fpath:
+        settings["path"] = getDirPath(fpath)
+        json.dump(settings, open("pbr.config", 'w'))
+        if str(fpath).find(".pbr") != -1:
+            btn1["state"] = DISABLED
+            btn2["state"] = DISABLED
+            btn3["state"] = DISABLED
+            btn4["state"] = NORMAL
+            btn1["bg"] = "#adf542"
+            btn1["fg"] = "#6B6B6B"
+            btn2["bg"] = "white"
+            btn2["fg"] = "#6B6B6B"
+            btn3["bg"] = "white"
+            btn3["fg"] = "#6B6B6B"
+            btn4["bg"] = "#6B6B6B"
+            btn1["text"] = "PBR File loaded"
+            logging.info("Auto-Push back PBR file loaded: " + fpath)
+            pbplayThd = threading.Thread(target=pbplay, args=(fpath,))
+            pbplayThd.start()
+        elif str(fpath).find(".pbt") != -1:
+            btn1["state"] = DISABLED
+            btn2["state"] = DISABLED
+            btn3["state"] = DISABLED
+            btn4["state"] = NORMAL
+            btn1["bg"] = "#adf542"
+            btn1["fg"] = "#6B6B6B"
+            btn2["bg"] = "white"
+            btn2["fg"] = "#6B6B6B"
+            btn3["bg"] = "white"
+            btn3["fg"] = "#6B6B6B"
+            btn4["bg"] = "#6B6B6B"
+            btn1["text"] = "PBT File loaded"
+            logging.info("Auto-Push back PBT file loaded: " + fpath)
+            pbplayTemplateThd = threading.Thread(target=pbplayT, args=(fpath,))
+            pbplayTemplateThd.start()
+        else:
+            logging.warning("Invalid Auto-Push back PBR file")
+    else:
+        logging.info("Auto-Push back PBR file loaded: Cancelled by user input")
+
 # Button 2 function
 def btnClickFunction2():
     btn1["state"] = DISABLED
@@ -150,103 +121,6 @@ def btnClickFunction3():
         pbrecThd.start()
     else:
         logging.info("Recording PBR file: Cancelled by user input")
-
-# PBT Button 1 function
-def PBTbtnClickFunction():
-    root.filename = filedialog.askopenfilename(initialdir=settings["path"],
-                                               title="Select your Push Back Recorder file",
-                                               filetypes=(("Record file", "*.pbr"), ("Template file", "*.pbt")))
-    fpath = root.filename
-    if fpath:
-        settings["path"] = getDirPath(fpath)
-        json.dump(settings, open("pbr.config", 'w'))
-        if str(fpath).find(".pbr") != -1:
-            btn1["state"] = DISABLED
-            btn2["state"] = DISABLED
-            btn3["state"] = DISABLED
-            btn4["state"] = NORMAL
-            btn1["bg"] = "#adf542"
-            btn1["fg"] = "#6B6B6B"
-            btn2["bg"] = "white"
-            btn2["fg"] = "#6B6B6B"
-            btn3["bg"] = "white"
-            btn3["fg"] = "#6B6B6B"
-            btn4["bg"] = "#6B6B6B"
-            btn1["text"] = "PBR File loaded"
-            logging.info("Auto-Push back PBR file loaded: " + fpath)
-            pbplayThd = threading.Thread(target=pbplay, args=(fpath,))
-            pbplayThd.start()
-        elif str(fpath).find(".pbt") != -1:
-            btn1["state"] = DISABLED
-            btn2["state"] = DISABLED
-            btn3["state"] = DISABLED
-            btn4["state"] = NORMAL
-            btn1["bg"] = "#adf542"
-            btn1["fg"] = "#6B6B6B"
-            btn2["bg"] = "white"
-            btn2["fg"] = "#6B6B6B"
-            btn3["bg"] = "white"
-            btn3["fg"] = "#6B6B6B"
-            btn4["bg"] = "#6B6B6B"
-            btn1["text"] = "PBT File loaded"
-            logging.info("Auto-Push back PBT file loaded: " + fpath)
-            pbplayTemplateThd = threading.Thread(target=pbplayT, args=(fpath,))
-            pbplayTemplateThd.start()
-        else:
-            logging.warning("Invalid Auto-Push back PBR file")
-        pbtWindow.destroy()
-    else:
-        logging.info("Auto-Push back PBR file loaded: Cancelled by user input")
-
-# PBT Button 2 Length function
-def PBTbtnClickFunction2():
-    pbtlbl1["text"] = " Select Push Back length:"
-    pbtbtn1["state"] = DISABLED
-    pbtbtn1.place_forget()
-    pbtbtn2["state"] = DISABLED
-    pbtbtn2.place_forget()
-    plgbtn1.place(x=135, y=380)
-    plgbtn2.place(x=135, y=215)
-    plgbtn3.place(x=135, y=50)
-
-# PBT Button 3 Template select function
-def PBTbtnClickFunction3(lgth):
-    global length
-    length = lgth
-    pbtlbl1["text"] = "Select Push Back direction:"
-    plgbtn1["state"] = DISABLED
-    plgbtn1.place_forget()
-    plgbtn2["state"] = DISABLED
-    plgbtn2.place_forget()
-    plgbtn3["state"] = DISABLED
-    plgbtn3.place_forget()
-    pbtbtn3.place(x=60, y=45)
-    pbtbtn4.place(x=205, y=45)
-    pbtbtn5.place(x=60, y=210)
-    pbtbtn6.place(x=205, y=210)
-    pbtbtn7.place(x=60, y=375)
-    pbtbtn8.place(x=205, y=375)
-    print(length)
-
-# PBT Button 4 Template launch function
-def PBTbtnClickFunction4(fpath):
-    pbtWindow.destroy()
-    btn1["state"] = DISABLED
-    btn2["state"] = DISABLED
-    btn3["state"] = DISABLED
-    btn4["state"] = NORMAL
-    btn1["bg"] = "#adf542"
-    btn1["fg"] = "#6B6B6B"
-    btn2["bg"] = "white"
-    btn2["fg"] = "#6B6B6B"
-    btn3["bg"] = "white"
-    btn3["fg"] = "#6B6B6B"
-    btn4["bg"] = "#6B6B6B"
-    btn1["text"] = "PBT File loaded"
-    logging.info("Auto-Push back PBT file loaded: " + fpath)
-    pbplayTemplateThd = threading.Thread(target=pbplayT, args=(fpath,))
-    pbplayTemplateThd.start()
-    
 
 # Toggles the push back using the GUI button
 def tugtglUI():
@@ -417,7 +291,7 @@ def simconnectLink():
                 smconnected = 1
                 logging.info("SimConnect:Linked")
                 lbl2["fg"] = "#adf542"
-                lbl2["text"] = "    SimConnect: Linked"
+                lbl2["text"] = "SimConnect: Linked"
                 aq = AircraftRequests(sm)  # Aircraft Requests Variable
                 ae = AircraftEvents(sm)  # Aircraft Event Variables
                 tug = ae.find("KEY_TUG_HEADING")
@@ -761,9 +635,9 @@ root = Tk()
 
 # Creates main window
 try:
-    root.geometry('460x390'+str(settings["uipos"][0])+str(settings["uipos"][1]))
+    root.geometry('400x390'+str(settings["uipos"][0])+str(settings["uipos"][1]))
 except:
-    root.geometry('460x390')
+    root.geometry('400x390')
 root.configure(background='#6B6B6B')
 root.title('Push Back Recorder')
 root.resizable(width=False, height=False)
@@ -794,33 +668,28 @@ global btn3
 global btn4
 global btn5
 
-# Creates Main Page buttons
-btn1image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\btn1.png")
-btn2image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\btn2.png")
-btn3image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\btn3.png")
-btn4image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\btn4.png")
-btn5image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\btn5.png")
-btn1 = Button(root, text='Auto-Push Back', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = LEFT, image=btn1image,
+# Creates Main Page buttons 
+btn1 = Button(root, text='Auto-Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
               command=btnClickFunction)
 btn1.place(x=5, y=10)
-btn2 = Button(root, text='Manual Push Back', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = LEFT, image=btn2image,
+btn2 = Button(root, text='Manual Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
               command=btnClickFunction2)
-btn2.place(x=5, y=55)
-btn3 = Button(root, text='Record Push Back', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = LEFT, image=btn3image, 
+btn2.place(x=5, y=50)
+btn3 = Button(root, text='Record Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
               command=btnClickFunction3)
-btn3.place(x=5, y=100)
-btn4 = Button(root, text='Toggle / Push Back', state=DISABLED, bg='white', fg="white", font=('segoe ui', 10, 'normal'), compound = LEFT, image=btn4image,
+btn3.place(x=5, y=90)
+btn4 = Button(root, text='Toggle / Push Back', state=DISABLED, bg='white', fg="white", font=('arial', 10, 'normal'),
               command=tugtglUI)
-btn4.place(x=170, y=10)
-btn5 = Button(root, text='Toggle / Jetway', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = LEFT, image=btn5image, command=jetwaytglUI)
-btn5.place(x=170, y=55)
+btn4.place(x=135, y=10)
+btn5 = Button(root, text='Toggle / Jetway', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'), command=jetwaytglUI)
+btn5.place(x=135, y=50)
 
 # Declares Auto-Push Back buttons
-btnapb1 = Button(root, text='Click to start Auto-Push Back', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'),
+btnapb1 = Button(root, text='Click to start Auto-Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
                  command=btnClickFunction2)
-btnapb2 = Button(root, text='Toggle / Jetway', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'),
+btnapb2 = Button(root, text='Toggle / Jetway', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
                  command=btnClickFunction2)
-btnpb1 = Button(root, text='Stop Push Back', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'),
+btnpb1 = Button(root, text='Stop Push Back', bg='#6B6B6B', fg="white", font=('arial', 10, 'normal'),
                 command=btnClickFunction2)
 
 # GUI Canvas images
@@ -829,30 +698,30 @@ global HowToImgTail
 
 # Creates "How to manual push back" canvas image 
 HowToImg = Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
-picture_file = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\howto.gif")
+picture_file = PhotoImage(file='howto.gif')
 HowToImg.create_image(380, 0, anchor=NE, image=picture_file)
-HowToImg.place(x=35, y=152)
+HowToImg.place(x=5, y=152)
 
-### Declares "How to auto-push back" canvas image
-##HowToImgTail = Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
-##picture_fileT = PhotoImage(file='howtoTail.gif')
-##HowToImgTail.create_image(380, 0, anchor=NE, image=picture_fileT)
+# Declares "How to auto-push back" canvas image
+HowToImgTail = Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
+picture_fileT = PhotoImage(file='howtoTail.gif')
+HowToImgTail.create_image(380, 0, anchor=NE, image=picture_fileT)
 
 # Creates "Logo" canvas image
 Logo = Canvas(root, height=100, width=100, bd=0, highlightthickness=0, relief='ridge')
-picture_fileL = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\logo.gif")
+picture_fileL = PhotoImage(file='logo.gif')
 Logo.create_image(100, 0, anchor=NE, image=picture_fileL)
-Logo.place(x=340, y=10)
+Logo.place(x=285, y=0)
 
 # GUI Labels
 global lbl1
 global lbl2
 # Creates Main Page labels
 lbl1 = Label(root, text='* Remember to keep this window focused while using manual/record push back', bg='#6B6B6B',
-             fg="#ffc000", font=('segoe ui', 9, 'normal'))
-lbl1.place(x=15, y=362)
-lbl2 = Label(root, text='SimConnect: Not linked', bg='#6B6B6B', fg="#ffc000", font=('segoe ui', 9, 'normal'))
-lbl2.place(x=320, y=113)
+             fg="#ffc000", font=('arial', 8, 'normal'))
+lbl1.place(x=5, y=362)
+lbl2 = Label(root, text='SimConnect: Not linked', bg='#6B6B6B', fg="#ffc000", font=('arial', 9, 'normal'))
+lbl2.place(x=250, y=83)
 
 # Declares a new thread for simconnectLink
 smcheck = threading.Thread(target=simconnectLink)
