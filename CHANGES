@@ -1,11 +1,11 @@
-- CHANGES ON THIS VERSION:
+- CHANGES IN THIS VERSION:
 
 
 -- [FIX] Fixed PBR showing Tip message in MSFS2020 "Recording push back..." while using Manual Push back and Auto-Push back feature
 
 -- [FIX] Record Push Back being not able to record 
 
--- [FIX] Auto-Push back GUI not working after recording (There is no need to reset the PBR App to use any other feature)
+-- [FIX] Auto-Push back GUI not working after recording (There is no need to reset the PBR App anymore to use any other feature)
 
 -- [FIX] Push back tug releases the plane without slowing down first (It will now slowdown the plane on release)
 
@@ -15,7 +15,15 @@
 
 -- [FIX] PBR now remembers the last accessed path
 
--- [IMPROVE] Improved GUI performance
+-- [IMPROVEMENT] Improved GUI performance
+
+-- [IMPROVEMENT] Improved GUI overall design 
+
+-- [IMPROVEMENT] Push Back Recorder and Play Back fully re-worked
+
+-- [IMPROVEMENT] Play Back accuracy improved
+
+-- [IMPROVEMENT] Reduced CPU usage
 
 -- [ADD] PBR is now compiled as an executable file and doesen't require Python 3.8.7 to be installed on the user system 
 
@@ -24,3 +32,13 @@
 -- [ADD] Added GUI Menu bar
 
 -- [ADD] Tooltips can now be disabled (Check for settings on the UI menu bar)
+
+-- [ADD] Play Back feature can now read Push Back Templates
+
+-- [ADD] NEW FEATURE: Planned Push Back
+
+-- [ADD] Ground to Flight deck comms audio added during push back phases (Thanks to OverKill for his collaboration on those amazing audio files!)
+
+-- [ADD] Tug will now connect and wait for user to release parking brakes before commencing push back
+
+-- [ADD] Tug will wait for user to set parking brakes before disconnecting 
