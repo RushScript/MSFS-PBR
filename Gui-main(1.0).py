@@ -12,6 +12,7 @@ import threading
 import json
 import webbrowser
 import keyboard
+from audioplayer import AudioPlayer
 
 # Logging configuration
 logging.basicConfig(filename='pbr.log', filemode='w', level=logging.DEBUG)
@@ -30,12 +31,6 @@ def customDialog(title, text, strings=('YES', 'NO'), bitmap='question', default=
 def getDirPath(dirpath):
     path, filename = os.path.split(dirpath)
     return path
-
-def rbSelect():
-    global varselected
-    if (varselected.get() == 1):
-        pbtrb1.invoke()
-        print(varselected.get())
 
 # Button 1 function
 def btnClickFunction():
@@ -63,17 +58,17 @@ def btnClickFunction():
     pbtWindow.resizable(width=False, height=False)
     pbtWindow.attributes('-topmost', True)
     pbtWindow.iconbitmap(default="AppIcon.ico")
-    pbtbtn1image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn1.png")
-    pbtbtn2image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn2.png")
-    pbtbtn3image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn3.png")
-    pbtbtn4image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn4.png")
-    pbtbtn5image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn5.png")
-    pbtbtn6image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn6.png")
-    pbtbtn7image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn7.png")
-    pbtbtn8image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\pbtbtn8.png")
-    plgbtn1image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\plgbtn1.png")
-    plgbtn2image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\plgbtn2.png")
-    plgbtn3image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\plgbtn3.png")
+    pbtbtn1image = PhotoImage(file=appdir+"\\Assets\\Images\\pbtbtn1.png")
+    pbtbtn2image = PhotoImage(file=appdir+"\\Assets\\Images\\pbtbtn2.png")
+    pbtbtn3image = PhotoImage(file=appdir+"\\Assets\\Images\\pbtbtn3.png")
+    pbtbtn4image = PhotoImage(file=appdir+"\\Assets\\Images\\pbtbtn4.png")
+    pbtbtn5image = PhotoImage(file=appdir+"\\Assets\\Images\\pbtbtn5.png")
+    pbtbtn6image = PhotoImage(file=appdir+"\\Assets\\Images\\pbtbtn6.png")
+    pbtbtn7image = PhotoImage(file=appdir+"\\Assets\\Images\\pbtbtn7.png")
+    pbtbtn8image = PhotoImage(file=appdir+"\\Assets\\Images\\pbtbtn8.png")
+    plgbtn1image = PhotoImage(file=appdir+"\\Assets\\Images\\plgbtn1.png")
+    plgbtn2image = PhotoImage(file=appdir+"\\Assets\\Images\\plgbtn2.png")
+    plgbtn3image = PhotoImage(file=appdir+"\\Assets\\Images\\plgbtn3.png")
     pbtlbl1 = Label(pbtWindow, text='Select type of Push Back:', bg='#6B6B6B',
              fg="#ffc000", font=('segoe ui', 16, 'normal'))
     pbtlbl1.place(x=80, y=0)
@@ -82,17 +77,17 @@ def btnClickFunction():
     pbtbtn2 = Button(pbtWindow, text='    Planned Push Back     ', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn2image,
               command=PBTbtnClickFunction2)
     pbtbtn3 = Button(pbtWindow, text='75° Left', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn3image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-LEFT-75.pbt"))
+              command=lambda: PBTbtnClickFunction4(appdir+"\\PBT\\"+length+"-LEFT-75.pbt"))
     pbtbtn4 = Button(pbtWindow, text='75° Right', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn4image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-RIGHT-75.pbt"))
+              command=lambda: PBTbtnClickFunction4(appdir+"\\PBT\\"+length+"-RIGHT-75.pbt"))
     pbtbtn5 = Button(pbtWindow, text='90° Left', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn5image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-LEFT-90.pbt"))
+              command=lambda: PBTbtnClickFunction4(appdir+"\\PBT\\"+length+"-LEFT-90.pbt"))
     pbtbtn6 = Button(pbtWindow, text='90° Right', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn6image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-RIGHT-90.pbt"))
+              command=lambda: PBTbtnClickFunction4(appdir+"\\PBT\\"+length+"-RIGHT-90.pbt"))
     pbtbtn7 = Button(pbtWindow, text='180° Left', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn7image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-LEFT-180.pbt"))
+              command=lambda: PBTbtnClickFunction4(appdir+"\\PBT\\"+length+"-LEFT-180.pbt"))
     pbtbtn8 = Button(pbtWindow, text='180° Right', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=pbtbtn8image,
-              command=lambda: PBTbtnClickFunction4(getDirPath(os.path.realpath(__file__))+"\\PBT\\"+length+"-RIGHT-180.pbt"))
+              command=lambda: PBTbtnClickFunction4(appdir+"\\PBT\\"+length+"-RIGHT-180.pbt"))
     plgbtn1 = Button(pbtWindow, text='Short', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=plgbtn1image,
               command=lambda: PBTbtnClickFunction3("SMALL"))
     plgbtn2 = Button(pbtWindow, text='Medium', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = TOP, image=plgbtn2image,
@@ -118,7 +113,8 @@ def btnClickFunction2():
     btn3["bg"] = "white"
     btn3["fg"] = "#6B6B6B"
     btn4["bg"] = "#6B6B6B"
-    pb()
+    pbThd = threading.Thread(target=pb)
+    pbThd.start()
 
 # Button 3 function
 def btnClickFunction3():
@@ -437,6 +433,8 @@ def simconnectLink():
 # Manual Push Back
 def pb():
     global recphase
+    global phdgbl
+    global pbstp
     recphase = False
     logging.info("Manual Push Back started")
     keyboard.add_hotkey("left",
@@ -447,8 +445,83 @@ def pb():
     keyboard.add_hotkey("right", lambda: heading('right'))
     keyboard.add_hotkey("up", lambda: pbst())
     keyboard.add_hotkey("down", lambda: tugtglUI())
-    return
-
+    while pbstp < 0:
+        time.sleep(0.500)
+        continue  
+    time.sleep(15)
+    pbphase(2, False)
+    contact = 0
+    while pbstp > 0:
+        gs = aq.find("GROUND_VELOCITY")
+        gs.time = smrft
+        gs = aq.get("GROUND_VELOCITY")
+        pbk = aq.find("BRAKE_PARKING_INDICATOR")
+        pbk.time = smrft
+        pbk = aq.get("BRAKE_PARKING_INDICATOR")
+        try:
+            if gs > 0.1:
+                if (contact == 0):
+                    freezetgl()
+                    contact = 1
+                    time.sleep(5)
+                    if settings["tooltips"] is True:
+                        sm.sendText("Release parking brakes")
+                    pbphase(3, True)
+                    while (pbk > 0.0):
+                        pbk = aq.find("BRAKE_PARKING_INDICATOR")
+                        pbk.time = smrft
+                        pbk = aq.get("BRAKE_PARKING_INDICATOR")
+                        time.sleep(1)
+                        if (pbk < 1.0):
+                            if settings["tooltips"] is True:
+                                sm.sendText("Starting push back")
+                            pbphase(4, True)
+                            time.sleep(4)
+                            freezetgl()
+        except:
+            logging.warning("aq.get(""GROUND_VELOCITY"") return null")
+            pass
+        while contact > 0:
+            gs = aq.find("GROUND_VELOCITY")
+            gs.time = smrft
+            gs = aq.get("GROUND_VELOCITY")
+            pbk = aq.find("BRAKE_PARKING_INDICATOR")
+            pbk.time = smrft
+            pbk = aq.get("BRAKE_PARKING_INDICATOR")
+            phd = aq.find("PLANE_HEADING_DEGREES_TRUE")
+            phd.time = smrft
+            phd = aq.get("PLANE_HEADING_DEGREES_TRUE")
+            phdgbl = phd
+            if (pbstp == 2):
+                tugtgl()
+                keyboard.unhook_all()
+                freezetgl()
+                contact = -1
+                pbk = aq.find("BRAKE_PARKING_INDICATOR")
+                pbk.time = smrft
+                pbk = aq.get("BRAKE_PARKING_INDICATOR")
+                time.sleep(1)
+            while contact < 0:
+                pbk = aq.find("BRAKE_PARKING_INDICATOR")
+                pbk.time = smrft
+                pbk = aq.get("BRAKE_PARKING_INDICATOR")
+                time.sleep(1)
+                try:
+                    if pbk > 0.0:
+                        time.sleep(5)
+                        tugtgl()
+                        freezetgl()
+                        contact = 0
+                        time.sleep(15)
+                        if settings["tooltips"] is True:
+                            sm.sendText("Tug disconnected. Have a safe flight!")
+                        pbphase(6, True)
+                        time.sleep(5)
+                        break
+                except:
+                    logging.warning("aq.get(""BRAKE_PARKING_INDICATOR"") return null")
+                    pass
+            
 # Record Push Back
 def pbrec(fpath):
     global recphase
@@ -485,6 +558,8 @@ def pbrec(fpath):
             if gs > 0.1:
                 if (contact == 0):
                     freezetgl()
+                    if settings["tooltips"] is True:
+                        sm.sendText("Release parking brakes")
                 while (pbk > 0.0):
                     pbk = aq.find("BRAKE_PARKING_INDICATOR")
                     pbk.time = smrft
@@ -506,9 +581,15 @@ def pbrec(fpath):
             logging.warning("aq.get(""GROUND_VELOCITY"") return null")
             pass
         time.sleep(smrft / 1000)
+    keyboard.unhook_all()
     tugspd(0)
     tugtgl()
     freezetgl()
+    if settings["tooltips"] is True:
+        sm.sendText("Set parking brakes")
+    pbk = aq.find("BRAKE_PARKING_INDICATOR")
+    pbk.time = smrft
+    pbk = aq.get("BRAKE_PARKING_INDICATOR")
     while (pbk < 1.0):
         pbk = aq.find("BRAKE_PARKING_INDICATOR")
         pbk.time = smrft
@@ -529,7 +610,7 @@ def recstate():
     global rec
     rec = rec - 1
     if rec == 1 and settings["tooltips"] is True:
-        sm.sendText("Release parking brakes")
+        sm.sendText("Tug is on his way")
         sm.sendText("Recording Push back...")
     return rec
 
@@ -592,6 +673,12 @@ def pbplay(fpath):
     aq.set("PLANE_LATITUDE",  pbr["latitude"][0])
     aq.set("PLANE_LONGITUDE", pbr["longitude"][0])
     aq.set("PLANE_HEADING_DEGREES_TRUE", pbr["trueheading"][0])
+    while pbstp < 0:
+        time.sleep(0.500)
+        continue
+    keyboard.unhook_all()
+    time.sleep(15)
+    pbphase(2, False)
     while contact > 0:
         gs = aq.find("GROUND_VELOCITY")
         gs.time = smrft
@@ -600,6 +687,10 @@ def pbplay(fpath):
             if gs > 0.1:
                 freezetgl()
                 contact = -1
+                time.sleep(5)
+                if settings["tooltips"] is True:
+                    sm.sendText("Release parking brakes")
+                pbphase(3, False)
         except:
             logging.warning("aq.get(""GROUND_VELOCITY"") return null")
             pass
@@ -610,6 +701,10 @@ def pbplay(fpath):
         time.sleep(1)
         try:
             if pbk < 1.0:
+                if settings["tooltips"] is True:
+                    sm.sendText("Starting push back")
+                pbphase(4, True)
+                time.sleep(4)
                 freezetgl()
                 start = time.time()
                 logging.info("Tick-Timer started")
@@ -637,6 +732,7 @@ def pbplay(fpath):
         time.sleep(smrft / 1000)
     contact = -1
     freezetgl()
+    pbkstate()
     while contact < 0:
         pbk = aq.find("BRAKE_PARKING_INDICATOR")
         pbk.time = smrft
@@ -647,11 +743,14 @@ def pbplay(fpath):
                 freezetgl()
                 contact = 0
                 tugtgl()
+                time.sleep(15)
+                if settings["tooltips"] is True:
+                    sm.sendText("Tug disconnected. Have a safe flight!")
+                pbphase(6, True)
         except:
             logging.warning("aq.get(""BRAKE_PARKING_INDICATOR"") return null")
             pass 
     logging.info("Auto-Push back template ended")
-    pbkstate()
 
 # Auto-Push Back PBT File
 def pbplayT(fpath):
@@ -663,6 +762,8 @@ def pbplayT(fpath):
     keyboard.add_hotkey("down", lambda: tugtglUI())
     contact = 1
     feets = 0
+    time.sleep(15)
+    pbphase(2, False)
     while contact > 0:
         gs = aq.find("GROUND_VELOCITY")
         gs.time = smrft
@@ -671,6 +772,10 @@ def pbplayT(fpath):
             if gs > 0.1:
                 freezetgl()
                 contact = -1
+                time.sleep(5)
+                if settings["tooltips"] is True:
+                    sm.sendText("Release parking brakes")
+                pbphase(3, True)
         except:
             logging.warning("aq.get(""GROUND_VELOCITY"") return null")
             pass
@@ -678,9 +783,13 @@ def pbplayT(fpath):
         pbk = aq.find("BRAKE_PARKING_INDICATOR")
         pbk.time = smrft
         pbk = aq.get("BRAKE_PARKING_INDICATOR")
-        time.sleep(1)
+        time.sleep(4)
         try:
             if pbk < 1.0:
+                if settings["tooltips"] is True:
+                    sm.sendText("Starting push back")
+                pbphase(4, True)
+                time.sleep(4)
                 freezetgl()
                 contact = 0
         except:
@@ -705,7 +814,9 @@ def pbplayT(fpath):
             steps += 1
         time.sleep(smrft / 1000)
     contact = -1
+    keyboard.unhook_all()
     freezetgl()
+    pbkstate()
     while contact < 0:
         pbk = aq.find("BRAKE_PARKING_INDICATOR")
         pbk.time = smrft
@@ -713,14 +824,19 @@ def pbplayT(fpath):
         time.sleep(1)
         try:
             if pbk > 0.0:
+                time.sleep(5)
                 freezetgl()
                 contact = 0
                 tugtgl()
+                time.sleep(15)
+                if settings["tooltips"] is True:
+                    sm.sendText("Tug disconnected. Have a safe flight!")
+                pbphase(6, True)
         except:
             logging.warning("aq.get(""BRAKE_PARKING_INDICATOR"") return null")
-            pass 
+            pass
+    print(feets)
     logging.info("Auto-Push back template ended")
-    pbkstate()
 
 # Push Back last steering direction 
 def pbst():
@@ -743,17 +859,32 @@ def pbkstate():
     global pbstp
     if (pbstp == 0):
         if settings["tooltips"] is True:
-            sm.sendText("Release parking brakes")
-        pbstp = 1
+            sm.sendText("Tug is on his way")
+        pbphase(1, False)
+        pbstp += 1
     else:
+        pbstp += 1
         if settings["tooltips"] is True:
-            sm.sendText("Set parking brakes")
+            sm.sendText("Push back completed, set parking brakes")
+        keyboard.unhook_all()
+        pbphase(5, True)
         tugspd(0)
         pbstp = 0
         time.sleep(2)
         resetUI()
 
+def pbphase(phase, wait):
+    comms = AudioPlayer(appdir+"\\Assets\\Audio\\"+str(phase)+".mp3")
+    comms.volume = volset
+    comms.play(block=wait)
+    print(appdir+"\\Assets\\Audio\\"+str(phase)+".mp3")
+        
+        
+
 ## Code sequence starts here
+# Gets the App Directory path
+appdir = getDirPath(os.path.realpath(__file__))
+#############################
 startAll()
 
 # GUI creation
@@ -795,11 +926,11 @@ global btn4
 global btn5
 
 # Creates Main Page buttons
-btn1image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\btn1.png")
-btn2image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\btn2.png")
-btn3image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\btn3.png")
-btn4image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\btn4.png")
-btn5image = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\btn5.png")
+btn1image = PhotoImage(file=appdir+"\\Assets\\Images\\btn1.png")
+btn2image = PhotoImage(file=appdir+"\\Assets\\Images\\btn2.png")
+btn3image = PhotoImage(file=appdir+"\\Assets\\Images\\btn3.png")
+btn4image = PhotoImage(file=appdir+"\\Assets\\Images\\btn4.png")
+btn5image = PhotoImage(file=appdir+"\\Assets\\Images\\btn5.png")
 btn1 = Button(root, text='Auto-Push Back', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = LEFT, image=btn1image,
               command=btnClickFunction)
 btn1.place(x=5, y=10)
@@ -829,7 +960,7 @@ global HowToImgTail
 
 # Creates "How to manual push back" canvas image 
 HowToImg = Canvas(root, height=190, width=380, bd=0, highlightthickness=0, relief='ridge')
-picture_file = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\howto.gif")
+picture_file = PhotoImage(file=appdir+"\\Assets\\Images\\howto.gif")
 HowToImg.create_image(380, 0, anchor=NE, image=picture_file)
 HowToImg.place(x=35, y=152)
 
@@ -840,7 +971,7 @@ HowToImg.place(x=35, y=152)
 
 # Creates "Logo" canvas image
 Logo = Canvas(root, height=100, width=100, bd=0, highlightthickness=0, relief='ridge')
-picture_fileL = PhotoImage(file=getDirPath(os.path.realpath(__file__))+"\\Assets\\Images\\logo.gif")
+picture_fileL = PhotoImage(file=appdir+"\\Assets\\Images\\logo.gif")
 Logo.create_image(100, 0, anchor=NE, image=picture_fileL)
 Logo.place(x=340, y=10)
 
@@ -854,10 +985,11 @@ lbl1.place(x=15, y=362)
 lbl2 = Label(root, text='SimConnect: Not linked', bg='#6B6B6B', fg="#ffc000", font=('segoe ui', 9, 'normal'))
 lbl2.place(x=320, y=113)
 
-# Declares a new thread for simconnectLink
+# Declares a new threads
 smcheck = threading.Thread(target=simconnectLink)
 
 # Local variables
+volset = 90
 hdg = ""
 pbstp = 0
 recphase = False
