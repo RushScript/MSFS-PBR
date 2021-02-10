@@ -32,4 +32,4 @@ Push Back Recorder is an MSFS2020 Push Back utility add-on which allows you to r
 
 
 ## Special thanks to [OverKill](https://www.youtube.com/channel/UC3VY4ObSBiPjHJ9Z5NJ1sAw)
-###for colaborating on those amazin audio files!
+##for his collaboration on those amazing [audio files](https://github.com/RushScript/MSFS-PBR/tree/main/Assets/Audio)!
