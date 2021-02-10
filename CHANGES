@@ -9,7 +9,7 @@
 
 -- [FIX] Push back tug releases the plane without slowing down first (It will now slowdown the plane on release)
 
--- [FIX] Change installer compression to zip to avoid AV false positives
+-- [FIX] Changed installer compression to zip to avoid AV false positives
 
 -- [FIX] Installer shortcuts fixed (Users can now pin the icon to the taskbar)
 
