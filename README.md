@@ -29,3 +29,7 @@ Push Back Recorder is an MSFS2020 Push Back utility add-on which allows you to r
 ## Known issues 
 - PBR won't work if SimRate is above x1.0
 - Log error: Could not create pbr.log (Use the default install path to avoid this issue)
+
+
+## Special thanks to [OverKill](https://www.youtube.com/channel/UC3VY4ObSBiPjHJ9Z5NJ1sAw)
+for his collaboration on those amazing [audio files](https://github.com/RushScript/MSFS-PBR/tree/main/Assets/Audio)!
