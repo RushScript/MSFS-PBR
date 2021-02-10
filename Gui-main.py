@@ -14,6 +14,9 @@ import webbrowser
 import keyboard
 from audioplayer import AudioPlayer
 
+############ APP VERSION ###############
+version = "1.0"
+
 # Logging configuration
 logging.basicConfig(filename='pbr.log', filemode='w', level=logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG)
@@ -222,7 +225,6 @@ def PBTbtnClickFunction3(lgth):
     pbtbtn6.place(x=205, y=210)
     pbtbtn7.place(x=60, y=375)
     pbtbtn8.place(x=205, y=375)
-    print(length)
 
 # PBT Button 4 Template launch function
 def PBTbtnClickFunction4(fpath):
@@ -476,8 +478,8 @@ def pb():
                         if (pbk < 1.0):
                             if settings["tooltips"] is True:
                                 sm.sendText("Starting push back")
-                            pbphase(4, True)
                             time.sleep(4)
+                            pbphaseEngineThd.start()
                             keyboard.add_hotkey("left", lambda: tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) - 27) % 360 * 11930464)))
                             keyboard.add_hotkey("left", lambda: heading('left'))
                             keyboard.add_hotkey("right", lambda: tug(((int(math.degrees(aq.get("PLANE_HEADING_DEGREES_TRUE"))) + 27) % 360 * 11930464)))
@@ -713,8 +715,8 @@ def pbplay(fpath):
             if pbk < 1.0:
                 if settings["tooltips"] is True:
                     sm.sendText("Starting push back")
-                pbphase(4, True)
                 time.sleep(4)
+                pbphaseEngineThd.start()
                 freezetgl()
                 start = time.time()
                 logging.info("Tick-Timer started")
@@ -803,8 +805,8 @@ def pbplayT(fpath):
             if pbk < 1.0:
                 if settings["tooltips"] is True:
                     sm.sendText("Starting push back")
-                pbphase(4, True)
                 time.sleep(4)
+                pbphaseEngineThd.start()
                 freezetgl()
                 contact = 0
         except:
@@ -852,7 +854,7 @@ def pbplayT(fpath):
         except:
             logging.warning("aq.get(""BRAKE_PARKING_INDICATOR"") return null")
             pass
-    print(feets)
+    #print(feets)
     logging.info("Auto-Push back template ended")
 
 # Push Back last steering direction 
@@ -894,7 +896,15 @@ def pbphase(phase, wait):
     comms = AudioPlayer(appdir+"\\Assets\\Audio\\"+str(phase)+".mp3")
     comms.volume = volset
     comms.play(block=wait)
-    print(appdir+"\\Assets\\Audio\\"+str(phase)+".mp3")
+    #print(appdir+"\\Assets\\Audio\\"+str(phase)+".mp3")
+
+def pbphaseDelay(phase, wait):
+    global commsD
+    time.sleep(wait)
+    commsD = AudioPlayer(appdir+"\\Assets\\Audio\\"+str(phase)+".mp3")
+    commsD.volume = volset
+    commsD.play()
+    #print(appdir+"\\Assets\\Audio\\"+str(phase)+".mp3")
 
 def unfreeze():
     if (aq.get("IS_LATITUDE_LONGITUDE_FREEZE_ON") == 1.0):
@@ -917,7 +927,7 @@ try:
 except:
     root.geometry('460x390')
 root.configure(background='#6B6B6B')
-root.title('Push Back Recorder')
+root.title('Push Back Recorder '+version)
 root.resizable(width=False, height=False)
 root.attributes('-topmost', True)
 root.iconbitmap(default="AppIcon.ico")
@@ -1008,6 +1018,7 @@ lbl2.place(x=320, y=113)
 
 # Declares a new threads
 smcheck = threading.Thread(target=simconnectLink)
+pbphaseEngineThd = threading.Thread(target=pbphaseDelay, args=(4, 8))
 
 # Local variables
 volset = 90
