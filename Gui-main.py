@@ -1023,4 +1023,7 @@ erft = 15       # Error Bug refresh rate
 smcheck.start()
 root.config(menu=menubar)
 root.mainloop()
-exitAll()
+try:
+    exitAll()
+except:
+    pass
