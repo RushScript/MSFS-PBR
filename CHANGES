@@ -1,6 +1,13 @@
 - CHANGES IN THIS VERSION:
 
 
+[1.0.1]
+-- [FIX] Fixed audio comms playing prior Tug inbound
+
+-- [FIX] Fixed audio will stil playing on the background even if the app is closed
+
+
+[1.0]
 -- [FIX] Fixed PBR showing Tip message in MSFS2020 "Recording push back..." while using Manual Push back and Auto-Push back feature
 
 -- [FIX] Record Push Back being not able to record 

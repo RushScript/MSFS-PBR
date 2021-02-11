@@ -15,7 +15,7 @@ import keyboard
 from audioplayer import AudioPlayer
 
 ############ APP VERSION ###############
-version = "1.0"
+version = "1.0.1"
 
 # Logging configuration
 logging.basicConfig(filename='pbr.log', filemode='w', level=logging.DEBUG)
@@ -243,8 +243,7 @@ def PBTbtnClickFunction4(fpath):
     btn1["text"] = "PBT File loaded"
     logging.info("Auto-Push back PBT file loaded: " + fpath)
     pbplayTemplateThd = threading.Thread(target=pbplayT, args=(fpath,))
-    pbplayTemplateThd.start()
-    
+    pbplayTemplateThd.start() 
 
 # Toggles the push back using the GUI button
 def tugtglUI():
@@ -306,6 +305,11 @@ def restartAll():
         os.execv(sys.executable, ['python'] + sys.argv)   
     except:
         logging.error("os.execv(sys.executable, ['python'] + sys.argv) - Could not restart the App")
+    try:
+        comms.close()
+        commsD.close()
+    except:
+        logging.warning("comms Audio close() - not executed")
     logging.info("APP:Restart")
     os._exit(0)
 
@@ -327,6 +331,11 @@ def exitAll():
         smcheck.join()
         sm.exit()
         logging.info("SimConnect:Clean exit")
+    try:
+        comms.close()
+        commsD.close()
+    except:
+        logging.warning("comms Audio close() - not executed")
     logging.info("APP:Exit")
     os._exit(0)
 
@@ -447,10 +456,9 @@ def pb():
     recphase = False
     logging.info("Manual Push Back started")
     keyboard.add_hotkey("down", lambda: tugtglUI())
-    while pbstp < 0:
+    while pbstp == 0:
         time.sleep(0.500)
         continue
-    keyboard.unhook_all()
     time.sleep(18)
     pbphase(2, False)
     contact = 0
@@ -685,9 +693,13 @@ def pbplay(fpath):
     aq.set("PLANE_LATITUDE",  pbr["latitude"][0])
     aq.set("PLANE_LONGITUDE", pbr["longitude"][0])
     aq.set("PLANE_HEADING_DEGREES_TRUE", pbr["trueheading"][0])
-    while pbstp < 0:
+    while pbstp == 0:
         time.sleep(0.500)
         continue
+    logging.info("Auto-Push back template started")
+    btn4["state"] = DISABLED
+    btn4["bg"] = "white"
+    btn4["fg"] = "#6B6B6B"
     keyboard.unhook_all()
     time.sleep(18)
     pbphase(2, False)
@@ -724,10 +736,6 @@ def pbplay(fpath):
         except:
             logging.warning("aq.get(""BRAKE_PARKING_INDICATOR"") return null")
             pass
-    logging.info("Auto-Push back template started")
-    btn4["state"] = DISABLED
-    btn4["bg"] = "white"
-    btn4["fg"] = "#6B6B6B"
     while steps <= pbr["steps"]:
         gs = aq.find("GROUND_VELOCITY")
         gs.time = smrft
@@ -775,9 +783,13 @@ def pbplayT(fpath):
     keyboard.add_hotkey("down", lambda: tugtglUI())
     contact = 1
     feets = 0
-    while pbstp < 0:
+    while pbstp == 0:
         time.sleep(0.500)
         continue
+    logging.info("Auto-Push back template started")
+    btn4["state"] = DISABLED
+    btn4["bg"] = "white"
+    btn4["fg"] = "#6B6B6B"
     keyboard.unhook_all()
     time.sleep(18)
     pbphase(2, False)
@@ -812,10 +824,6 @@ def pbplayT(fpath):
         except:
             logging.warning("aq.get(""BRAKE_PARKING_INDICATOR"") return null")
             pass          
-    logging.info("Auto-Push back template started")
-    btn4["state"] = DISABLED
-    btn4["bg"] = "white"
-    btn4["fg"] = "#6B6B6B"
     while steps < pbt["steps"][0] + 1:
         gs = aq.find("GROUND_VELOCITY")
         gs.time = smrft
@@ -909,9 +917,7 @@ def pbphaseDelay(phase, wait):
 def unfreeze():
     if (aq.get("IS_LATITUDE_LONGITUDE_FREEZE_ON") == 1.0):
         freezetgl()
-        
-        
-
+               
 ## Code sequence starts here
 # Gets the App Directory path
 appdir = getDirPath(os.path.realpath(__file__))
