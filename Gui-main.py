@@ -839,7 +839,6 @@ def pbplayT(fpath):
             steps += 1
         time.sleep(smrft / 1000)
     contact = -1
-    keyboard.unhook_all()
     freezetgl()
     pbkstate()
     while contact < 0:
