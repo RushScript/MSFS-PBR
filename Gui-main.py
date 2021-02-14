@@ -1043,4 +1043,4 @@ root.mainloop()
 try:
     exitAll()
 except:
-    pass
+    sys.exit()
