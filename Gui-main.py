@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import filedialog
 from tkinter import dialog
+from tkinter import messagebox
 import tkinter as tk
 from SimConnect import *
 import sys
@@ -15,7 +16,7 @@ import keyboard
 from audioplayer import AudioPlayer
 
 ############ APP VERSION ###############
-version = "1.0.1"
+version = "1.0.2"
 
 # Logging configuration
 logging.basicConfig(filename='pbr.log', filemode='w', level=logging.DEBUG)
@@ -257,6 +258,10 @@ def tugtglUI():
 def jetwaytglUI():
     jetwaytgl()
 
+# Toggles the Parking Brakesusing the GUI button
+def brakestglUI():
+    pbktgl()
+
 # On start GUI function
 def startAll():
     global settings
@@ -300,6 +305,10 @@ def restartAll():
     if (smconnected == 1):
         smcheck.join()
         sm.exit()
+        try:
+            pbphaseEngineThd.join()
+        except:
+            pass
         logging.info("SimConnect:Clean exit")
     try:
         os.execv(sys.executable, ['python'] + sys.argv)   
@@ -316,20 +325,27 @@ def restartAll():
 # On exit GUI function
 def exitAll():
     global smconnected
-    if root.winfo_x() > 0:
-        x = "+"+str(root.winfo_x())
-    else:
-        x = str(root.winfo_x())
-    if root.winfo_y() > 0:
-        y = "+"+str(root.winfo_y())
-    else:
-        y = str(root.winfo_y())
-    settings["uipos"] = (x, y)
-    json.dump(settings, open("pbr.config", 'w'))
+    try:
+        if root.winfo_x() > 0:
+            x = "+"+str(root.winfo_x())
+        else:
+            x = str(root.winfo_x())
+        if root.winfo_y() > 0:
+            y = "+"+str(root.winfo_y())
+        else:
+            y = str(root.winfo_y())
+        settings["uipos"] = (x, y)
+        json.dump(settings, open("pbr.config", 'w'))
+    except:
+        pass
     if (smconnected == 1):
         unfreeze()
         smcheck.join()
         sm.exit()
+        try:
+            pbphaseEngineThd.join()
+        except:
+            pass
         logging.info("SimConnect:Clean exit")
     try:
         comms.close()
@@ -411,6 +427,7 @@ def simconnectLink():
     global tugspd
     global tugtgl
     global jetwaytgl
+    global pbktgl
     global pkbrakes
     global freezetgl
     # Local var used to loop on SimConnect link attempt
@@ -438,6 +455,7 @@ def simconnectLink():
                 tugspd = ae.find("KEY_TUG_SPEED")
                 tugtgl = ae.find("TOGGLE_PUSHBACK")
                 jetwaytgl = ae.find("TOGGLE_JETWAY")
+                pbktgl = ae.find("PARKING_BRAKES")
                 pkbrakes = ae.find("PARKING_BRAKES")
                 freezetgl = ae.find("FREEZE_LATITUDE_LONGITUDE_TOGGLE")
                 return (sm)
@@ -690,9 +708,12 @@ def pbplay(fpath):
     keyboard.add_hotkey("down", lambda: tugtglUI())
     contact = 1
     start = 0
-    aq.set("PLANE_LATITUDE",  pbr["latitude"][0])
-    aq.set("PLANE_LONGITUDE", pbr["longitude"][0])
-    aq.set("PLANE_HEADING_DEGREES_TRUE", pbr["trueheading"][0])
+    if int(pbr["latitude"][0] * 1000000) == int(aq.get("PLANE_LATITUDE") * 1000000):
+        aq.set("PLANE_LATITUDE",  pbr["latitude"][0])
+        aq.set("PLANE_LONGITUDE", pbr["longitude"][0])
+        aq.set("PLANE_HEADING_DEGREES_TRUE", pbr["trueheading"][0])
+    else:
+       messagebox.showinfo(message="This PBR file was recorded on a different spot. This will result in an inaccurate Play back.", title="Push Back Recorder")
     while pbstp == 0:
         time.sleep(0.500)
         continue
@@ -967,6 +988,7 @@ btn2image = PhotoImage(file=appdir+"\\Assets\\Images\\btn2.png")
 btn3image = PhotoImage(file=appdir+"\\Assets\\Images\\btn3.png")
 btn4image = PhotoImage(file=appdir+"\\Assets\\Images\\btn4.png")
 btn5image = PhotoImage(file=appdir+"\\Assets\\Images\\btn5.png")
+btn6image = PhotoImage(file=appdir+"\\Assets\\Images\\btn6.png")
 btn1 = Button(root, text='Auto-Push Back', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = LEFT, image=btn1image,
               command=btnClickFunction)
 btn1.place(x=5, y=10)
@@ -981,6 +1003,8 @@ btn4 = Button(root, text='Toggle / Push Back', state=DISABLED, bg='white', fg="w
 btn4.place(x=170, y=10)
 btn5 = Button(root, text='Toggle / Jetway', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = LEFT, image=btn5image, command=jetwaytglUI)
 btn5.place(x=170, y=55)
+btn5 = Button(root, text='Toggle / Brakes', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'), compound = LEFT, image=btn6image, command=brakestglUI)
+btn5.place(x=170, y=100)
 
 # Declares Auto-Push Back buttons
 btnapb1 = Button(root, text='Click to start Auto-Push Back', bg='#6B6B6B', fg="white", font=('segoe ui', 10, 'normal'),
@@ -1039,7 +1063,4 @@ erft = 15       # Error Bug refresh rate
 smcheck.start()
 root.config(menu=menubar)
 root.mainloop()
-try:
-    exitAll()
-except:
-    sys.exit()
+exitAll()
