@@ -2,7 +2,8 @@
 
 
 [1.0.2]
--- [FIX] Planned push back not responding and keeps going straight (This might have been sorte, please report if the problem persists)
+
+-- [FIX] Planned push back not responding and keeps going straight (This might have been sorted, please report if the problem persists)
 
 -- [FIX] Fine-tuned push back templates values to avoid static movement at the end of push back
 
@@ -16,12 +17,14 @@
 
 
 [1.0.1]
+
 -- [FIX] Fixed audio comms playing prior Tug inbound
 
 -- [FIX] Fixed audio will stil playing on the background even if the app is closed
 
 
 [1.0]
+
 -- [FIX] Fixed PBR showing Tip message in MSFS2020 "Recording push back..." while using Manual Push back and Auto-Push back feature
 
 -- [FIX] Record Push Back being not able to record 
