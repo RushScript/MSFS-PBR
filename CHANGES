@@ -1,6 +1,20 @@
 - CHANGES IN THIS VERSION:
 
 
+[1.0.2]
+-- [FIX] Planned push back not responding and keeps going straight (This might have been sorte, please report if the problem persists)
+
+-- [FIX] Fine-tuned push back templates values to avoid static movement at the end of push back
+
+-- [FIX] The app wont run in the background anymore after closing the GUI
+
+-- [ADD] Added Parking Brakes toggle button to the GUI
+
+-- [ADD] You can now use your PBR files in differents spots (An information message will be displayed letting you know that the PBR file belongs to a different spot)
+
+
+
+
 [1.0.1]
 -- [FIX] Fixed audio comms playing prior Tug inbound
 
