@@ -11,6 +11,7 @@ Push Back Recorder is an MSFS2020 Push Back utility add-on which allows you to r
 - Record Push Back: Record your push back using your keyboard keys and save your PBR file so it can be played back with the Auto-Push Back feature later on
 - Toggle / Push Back: Toggles the push back tug
 - Toggle / Jetway: Toggles the jetway connection (If available at your spot)
+- Toggle / Brakes: Toggles the Parking Brakes
 
 
 ## Installation 
